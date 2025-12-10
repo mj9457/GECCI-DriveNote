@@ -1,5 +1,6 @@
 // components/vehicle/LoginScreen.tsx
 import { AlertCircle, Truck } from 'lucide-react';
+import Image from "next/image";
 
 interface LoginScreenProps {
     onLogin: () => void;
@@ -13,9 +14,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, error }) => (
                 <Truck className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
             </div>
             <div className="flex flex-col items-center">
-                <img
+                <Image
                     src="https://gecci.korcham.net/images/logo/logo_top/gecci_top_logo.png"
                     className="mb-4 sm:mb-5 w-32 sm:w-40 lg:w-44"
+                    width={176}
+                    height={48}
+                    alt="GECCI Logo"
                 />
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
                     차량 운행 관리 시스템
@@ -38,10 +42,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, error }) => (
                 onClick={onLogin}
                 className="w-full bg-white border border-gray-300 text-gray-700 font-semibold py-2.5 sm:py-3 px-4 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors shadow-sm text-sm sm:text-base"
             >
-                <img
+                <Image
                     src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                    alt="Google"
                     className="w-4 h-4 sm:w-5 sm:h-5"
+                    alt="Google"
+                    width={20}
+                    height={20}
                 />
                 Google 계정으로 로그인
             </button>

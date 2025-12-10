@@ -14,7 +14,11 @@ export const useVehicleAuth = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
-                setUser(currentUser);
+                setUser({
+                    uid: currentUser.uid,
+                    displayName: currentUser.displayName ?? undefined,
+                    email: currentUser.email ?? undefined,
+                });
                 setLoading(true);
 
                 try {
