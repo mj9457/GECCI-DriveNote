@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    // allow external hosts used by the app for logos/icons
+    domains: ['gecci.korcham.net', 'www.gstatic.com'],
+  },
 };
 
 export default nextConfig;

@@ -4,7 +4,10 @@ import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db, appId } from '@/lib/firebaseClient';
 import { Booking, DriveLog } from '@/types/vehicle';
 
-export const useRealtimeVehicleData = (user: any | null, isApproved: boolean) => {
+export const useRealtimeVehicleData = (
+    user: { uid?: string; email?: string } | null,
+    isApproved: boolean,
+) => {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [driveLogs, setDriveLogs] = useState<DriveLog[]>([]);
 
@@ -12,10 +15,10 @@ export const useRealtimeVehicleData = (user: any | null, isApproved: boolean) =>
         if (!user || !isApproved) return;
 
         const qBookings = query(
-            collection(db, 'artifacts', appId, 'public', 'data', 'vehicle_bookings'),
+            collection(db, 'artifacts', appId as string, 'public', 'data', 'vehicle_bookings'),
         );
         const qLogs = query(
-            collection(db, 'artifacts', appId, 'public', 'data', 'vehicle_drive_logs'),
+            collection(db, 'artifacts', appId as string, 'public', 'data', 'vehicle_drive_logs'),
         );
 
         const unsubBookings = onSnapshot(qBookings, (snapshot) => {
@@ -35,12 +38,12 @@ export const useRealtimeVehicleData = (user: any | null, isApproved: boolean) =>
         return () => {
             try {
                 unsubBookings();
-            } catch (e) {
+            } catch {
                 /* ignore */
             }
             try {
                 unsubLogs();
-            } catch (e) {
+            } catch {
                 /* ignore */
             }
         };

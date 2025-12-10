@@ -8,7 +8,7 @@ import {
     User,
 } from 'lucide-react';
 import { Booking, TimeInputs, View } from '@/types/vehicle';
-import { VEHICLES, VEHICLE_COLORS } from '@/lib/vehicleConstants';
+import { VEHICLES } from '@/lib/vehicleConstants';
 import { formatDate, normalizeTimeInput } from '@/lib/timeUtils';
 import { toast } from 'sonner';
 import { useMemo } from 'react';
@@ -186,23 +186,6 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                             {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월{' '}
                             {selectedDate.getDate()}일
                         </div>
-
-                        {!isReadOnly && (
-                            <input
-                                type="date"
-                                value={formatDate(selectedDate)}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (!value) return;
-                                    const [y, m, d] = value.split('-').map(Number);
-                                    const newDate = new Date(y, m - 1, d);
-                                    // 날짜 변경은 상위에서 처리 (여기서는 onBack으로만 이동)
-                                    // 필요하면 별도 콜백 추가
-                                    toast.info('날짜 변경은 아직 상위에서 처리하도록 구현해주세요.');
-                                }}
-                                className="w-full sm:w-auto px-2.5 sm:px-3 py-2 sm:py-2.5 border rounded-lg text-xs sm:text-sm outline-none bg-white focus:ring-2 focus:ring-blue-500"
-                            />
-                        )}
                     </div>
                 </div>
 

@@ -3,7 +3,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { LogOut, Truck, User as UserIcon } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 import { db, appId } from '@/lib/firebaseClient';
@@ -20,20 +19,13 @@ import {
 
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
-import { CalendarView } from '@/components/vehicle/views/CalendarView';
-import { DayView } from '@/components/vehicle/views/DayView';
-import { BookingForm } from '@/components/vehicle/views/BookingForm';
-import { MonthListView } from '@/components/vehicle/views/MonthListView';
-import { DriveLogForm } from '@/components/vehicle/views/DriveLogForm';
-import { LogsListView } from '@/components/vehicle/views/LogsListView';
-import { UserSummaryView } from '@/components/vehicle/views/UserSummaryView';
 import { useVehicleAuth } from '@/components/vehicle/hooks/useVehicleAuth';
 import { useRealtimeVehicleData } from '@/components/vehicle/hooks/useRealtimeVehicleData';
 import useActions from '@/components/vehicle/hooks/useActions';
 import { Header } from '@/components/vehicle/layout/Header';
 import FAB from '@/components/vehicle/layout/FAB';
 import MainViews from '@/components/vehicle/layout/MainViews';
-import { checkOverlap as utilCheckOverlap, getPrevFinalKm as utilGetPrevFinalKm } from '@/lib/vehicleUtils';
+import { checkOverlap as utilCheckOverlap, getPrevFinalKm} from '@/lib/vehicleUtils';
 
 export default function VehicleApp() {
     const {
@@ -53,7 +45,6 @@ export default function VehicleApp() {
 
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
-    // bookings / driveLogs are provided by realtime hook
 
     const [logForm, setLogForm] = useState<LogFormState>({
         from: '다남프라자',
@@ -150,7 +141,8 @@ export default function VehicleApp() {
     }, [view, selectedBooking, driveLogs]);
 
     // ----------------- Handlers -----------------
-    const { saveBooking, deleteBooking: actionDeleteBooking, saveDriveLog, deleteDriveLog } = useActions();
+    const { saveBooking, deleteBooking: actionDeleteBooking } = useActions();
+
 
     // auth handlers provided by useVehicleAuth
 
@@ -160,12 +152,7 @@ export default function VehicleApp() {
             try {
                 const userDocRef = doc(
                     db,
-                    'artifacts',
-                    appId,
-                    'public',
-                    'data',
-                    'allowed_users',
-                    user.email!,
+                    `artifacts/${appId}/public/data/allowed_users/${user.email}`,
                 );
                 const userDocSnap = await getDoc(userDocRef);
 
@@ -240,83 +227,9 @@ export default function VehicleApp() {
         setSelectedDate(newDate);
     };
 
-    const timeToMinutes = (t: string) => {
-        const [hStr, mStr] = t.split(':');
-        const h = parseInt(hStr || '0', 10);
-        const m = parseInt(mStr || '0', 10);
-        // '24:00' 은 익일 0시로 처리
-        if (h === 24 && m === 0) return 24 * 60;
-        return h * 60 + m;
-    };
-
-    // 🔹 기존 checkOverlap 전체를 이걸로 교체
-    const checkOverlap = (
-        vId: string,
-        dateStr: string,
-        startT: string,
-        endT: string,
-        excludeId?: string,
-    ) => {
-        const startMin = timeToMinutes(startT);
-        const endMin = timeToMinutes(endT);
-
-        return bookings.some((b) => {
-            if (b.vehicleId !== vId || b.date !== dateStr) return false;
-            if (excludeId && b.id === excludeId) return false;
-
-            const bStart = timeToMinutes(b.startTime);
-            const bEnd = timeToMinutes(b.endTime);
-
-            // [start, end) 와 [bStart, bEnd) 가 겹치면 true
-            return startMin < bEnd && endMin > bStart;
-        });
-    };
-
-    // 이전 운행 최종키로수
-    const getPrevFinalKm = (
-        vehicleId: string,
-        dateStr: string,
-        bookingId?: string,
-        bookingStartTime?: string,
-    ): number | null => {
-        const logs = driveLogs
-            .filter((log) => {
-                if (log.vehicleId !== vehicleId) return false;
-                if (!log.date) return false;
-                if (bookingId && log.bookingId === bookingId) return false;
-
-                if (log.date < dateStr) return true;
-                if (log.date > dateStr) return false;
-
-                if (!bookingStartTime) return true;
-
-                const relatedBooking = bookings.find((b) => b.id === log.bookingId);
-                const logStart = relatedBooking?.startTime || '00:00';
-                return logStart < bookingStartTime;
-            })
-            .sort((a, b) => {
-                if (a.date !== b.date) {
-                    return String(a.date).localeCompare(String(b.date));
-                }
-                const bookingA = bookings.find((bk) => bk.id === a.bookingId);
-                const bookingB = bookings.find((bk) => bk.id === b.bookingId);
-                const sa = bookingA?.startTime || '00:00';
-                const sb = bookingB?.startTime || '00:00';
-                return sa.localeCompare(sb);
-            });
-
-        if (logs.length === 0) return null;
-
-        const last = logs[logs.length - 1];
-        const raw = last.finalKm;
-        if (typeof raw === 'number') return raw;
-        const n = Number(raw as any);
-        return Number.isNaN(n) ? null : n;
-    };
-
     // 배차 저장
     const handleBookingSubmit = async () => {
-        if (isSubmitting) return;
+        if (isSubmitting || !user) return;
         setIsSubmitting(true);
 
         const normalizedStart = normalizeTimeInput(timeInputs.start);
@@ -393,7 +306,7 @@ export default function VehicleApp() {
                         userId: user.uid,
                         userName: user.displayName,
                         updatedAt: new Date().toISOString(),
-                    } as any,
+                    } as Booking,
                 });
 
                 if (res.ok) {
@@ -414,7 +327,7 @@ export default function VehicleApp() {
                         userId: user.uid,
                         userName: user.displayName,
                         createdAt: new Date().toISOString(),
-                    } as any,
+                    } as Booking,
                 });
 
                 if (res.ok) {
@@ -520,7 +433,7 @@ export default function VehicleApp() {
             const logRef = doc(
                 db,
                 'artifacts',
-                appId,
+                String(appId),
                 'public',
                 'data',
                 'vehicle_drive_logs',
@@ -546,6 +459,8 @@ export default function VehicleApp() {
         const dateStr = booking.date || formatDate(selectedDate);
 
         const prevKmRaw = getPrevFinalKm(
+            bookings,
+            driveLogs,
             booking.vehicleId,
             dateStr,
             booking.id,
@@ -597,20 +512,20 @@ export default function VehicleApp() {
                 const logRef = doc(
                     db,
                     'artifacts',
-                    appId,
+                    String(appId),
                     'public',
                     'data',
                     'vehicle_drive_logs',
                     existingLog.id,
                 );
-                await updateDoc(logRef, baseData as any);
+                await updateDoc(logRef, baseData as Partial<DriveLog>);
                 toast.success('운행일지가 수정되었습니다.');
             } else {
                 await addDoc(
                     collection(
                         db,
                         'artifacts',
-                        appId,
+                        String(appId),
                         'public',
                         'data',
                         'vehicle_drive_logs',
@@ -618,7 +533,7 @@ export default function VehicleApp() {
                     {
                         ...baseData,
                         createdAt: new Date().toISOString(),
-                    } as any,
+                    } as Omit<DriveLog, 'id'>,
                 );
                 toast.success('운행일지가 저장되었습니다.');
             }
@@ -712,7 +627,7 @@ export default function VehicleApp() {
     if (!isApproved) {
         return (
             <UnauthorizedScreen
-                email={user.email}
+                email={user.email || user.uid || ''}
                 onLogout={handleLogout}
             />
         );
@@ -723,210 +638,77 @@ export default function VehicleApp() {
             <Toaster position="top-center" richColors closeButton />
             <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-6xl mx-auto bg-gray-100 md:bg-gray-50 md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2 sm:my-4 md:my-6">
                 {/* Header */}
-                <header className="bg-white text-gray-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between z-30 shadow-sm relative">
-                    {/* 좌측: 아이콘 + 제목 */}
-                    <div
-                        className="flex items-center gap-1.5 sm:gap-2 cursor-pointer"
-                        onClick={() => setView('calendar')}
-                    >
-                        <div className="bg-blue-600 p-1.5 sm:p-2 rounded-lg text-white">
-                            <Truck size={18} className="sm:w-5 sm:h-5" />
-                        </div>
-                        <h1 className="font-bold text-base sm:text-lg md:text-xl">
-                            {headerTitle}
-                        </h1>
-                    </div>
+                <Header
+                    headerTitle={headerTitle}
+                    user={user}
+                    pendingLogCount={pendingLogCount}
+                    pendingLogBadgeText={pendingLogBadgeText}
+                    onUserClick={() => setView('user')}
+                    onLogout={handleLogout}
+                    view={view}
+                    setView={setView}
+                />
 
-                    {/* 중앙: 뷰 전환 토글 */}
-                    <div className="absolute left-1/2 -translate-x-1/2">
-                        <div className="flex items-center gap-1 sm:gap-2 bg-gray-100 px-1.5 py-1 rounded-full text-[11px] sm:text-xs">
-                            <button
-                                type="button"
-                                onClick={() => setView('calendar')}
-                                className={`px-2 py-0.5 rounded-full font-medium ${view === 'calendar' ||
-                                    view === 'day' ||
-                                    view === 'form'
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-500'
-                                    }`}
-                            >
-                                달력 보기
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setView('list')}
-                                className={`px-2 py-0.5 rounded-full font-medium ${view === 'list'
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-500'
-                                    }`}
-                            >
-                                월별 목록
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => setView('logs')}
-                                className={`px-2 py-0.5 rounded-full font-medium ${view === 'logs' || view === 'log'
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-500'
-                                    }`}
-                            >
-                                운행일지
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* 우측: 사용자 pill + 로그아웃 */}
-                    <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="relative">
-                            {pendingLogCount > 0 && (
-                                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center border border-white pointer-events-none">
-                                    {pendingLogBadgeText}
-                                </span>
-                            )}
-
-                            <div
-                                className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm bg-gray-50 px-2.5 sm:px-3 py-1.5 rounded-full border max-w-[140px] sm:max-w-[170px] cursor-pointer hover:bg-blue-50 hover:border-blue-400"
-                                onClick={() => setView('user')}
-                            >
-                                <UserIcon
-                                    size={12}
-                                    className="sm:w-4 sm:h-4 text-gray-500"
-                                />
-                                <span className="font-medium text-gray-700 truncate">
-                                    {user.displayName || user.email}
-                                </span>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={handleLogout}
-                            className="text-gray-400 hover:text-red-500 transition-colors"
-                        >
-                            <LogOut size={18} className="sm:w-5 sm:h-5" />
-                        </button>
-                    </div>
-                </header>
-
-                {/* Main */}
-                <main className="flex-1 overflow-auto bg-white md:bg-gray-50 relative">
-                    {view === 'calendar' && (
-                        <CalendarView
-                            currentDate={currentDate}
-                            bookings={bookings}
-                            selectedDate={selectedDate}
-                            onChangeMonth={changeMonth}
-                            onSelectDate={(date) => {
-                                setSelectedDate(date);
-                                setView('day');
-                            }}
-                            onGoToday={goToCurrentMonth}
-                        />
-                    )}
-
-                    {view === 'day' && (
-                        <DayView
-                            selectedDate={selectedDate}
-                            bookings={bookings}
-                            onBackToCalendar={() => setView('calendar')}
-                            onChangeDay={changeDay}
-                            onOpenBookingForm={openBookingForm}
-                        />
-                    )}
-
-                    {view === 'form' && (
-                        <BookingForm
-                            mode={formMode}
-                            selectedDate={selectedDate}
-                            formViewPrev={prevView}
-                            formData={formData}
-                            defaultDept={defaultDept}
-                            timeInputs={timeInputs}
-                            bookings={bookings}
-                            selectedBooking={selectedBooking}
-                            isSubmitting={isSubmitting}
-                            onChangeFormData={setFormData}
-                            onChangeTimeInputs={setTimeInputs}
-                            onSubmit={handleBookingSubmit}
-                            onDelete={handleDeleteBooking}
-                            onBack={(v) => setView(v)}
-                            userId={user.uid}
-                            checkOverlap={checkOverlap}
-                        />
-                    )}
-
-                    {view === 'list' && (
-                        <MonthListView
-                            currentDate={currentDate}
-                            bookings={bookings}
-                            driveLogs={driveLogs}
-                            vehicleFilter={vehicleFilter}
-                            onVehicleFilterChange={setVehicleFilter}
-                            onChangeMonth={changeMonth}
-                            onGoToday={goToCurrentMonth}
-                            onOpenBookingForm={openBookingForm}
-                            onOpenDriveLogForm={openDriveLogForm}
-                        />
-                    )}
-
-                    {view === 'log' && selectedBooking && (
-                        <DriveLogForm
-                            booking={selectedBooking}
-                            logForm={logForm}
-                            prevKm={getPrevFinalKm(
-                                selectedBooking.vehicleId,
-                                selectedBooking.date,
-                                selectedBooking.id,
-                                selectedBooking.startTime,
-                            )}
-                            onChangeLogForm={setLogForm}
-                            onSubmit={handleLogSubmit}
-                            onBack={() => setView(prevView)}
-                        />
-                    )}
-
-                    {view === 'logs' && (
-                        <LogsListView
-                            currentDate={currentDate}
-                            bookings={bookings}
-                            driveLogs={driveLogs}
-                            vehicleFilter={vehicleFilter}
-                            onVehicleFilterChange={setVehicleFilter}
-                            onChangeMonth={changeMonth}
-                            onGoToday={goToCurrentMonth}
-                            onOpenDriveLogForm={openDriveLogForm}
-                        />
-                    )}
-
-                    {view === 'user' && (
-                        <UserSummaryView
-                            currentDate={currentDate}
-                            user={user}
-                            bookings={bookings}
-                            driveLogs={driveLogs}
-                            vehicleFilter={vehicleFilter}
-                            onVehicleFilterChange={setVehicleFilter}
-                            onChangeMonth={changeMonth}
-                            onGoToday={goToCurrentMonth}
-                            onOpenDriveLogForm={openDriveLogForm}
-                            onDeleteMyBooking={handleDeleteMyBooking}
-                            onDeleteMyLog={handleDeleteMyLog}
-                        />
-                    )}
-                </main>
+                {user && user.uid && (
+                    <MainViews
+                        view={view}
+                        currentDate={currentDate}
+                        bookings={bookings}
+                        driveLogs={driveLogs}
+                        selectedDate={selectedDate}
+                        selectedBooking={selectedBooking}
+                        formMode={formMode}
+                        timeInputs={timeInputs}
+                        formData={formData}
+                        defaultDept={defaultDept}
+                        isSubmitting={isSubmitting}
+                        vehicleFilter={vehicleFilter}
+                        onVehicleFilterChange={setVehicleFilter}
+                        onChangeMonth={changeMonth}
+                        onSelectDate={(date) => {
+                            setSelectedDate(date);
+                            setView('day');
+                        }}
+                        onGoToday={goToCurrentMonth}
+                        onChangeDay={changeDay}
+                        onOpenBookingForm={openBookingForm}
+                        onOpenDriveLogForm={openDriveLogForm}
+                        onSubmitBooking={handleBookingSubmit}
+                        onDeleteBooking={handleDeleteBooking}
+                        onBackFromForm={(v) => setView(v)}
+                        onChangeFormData={setFormData}
+                        onChangeTimeInputs={setTimeInputs}
+                        onChangeLogForm={setLogForm}
+                        onSubmitLog={handleLogSubmit}
+                        onBackFromLog={() => setView(prevView)}
+                        onDeleteMyBooking={handleDeleteMyBooking}
+                        onDeleteMyLog={handleDeleteMyLog}
+                        checkOverlap={(vId, dateStr, startT, endT, excludeId) =>
+                            utilCheckOverlap(bookings, vId, dateStr, startT, endT, excludeId)
+                        }
+                        logForm={logForm}
+                        prevKm={
+                            selectedBooking
+                                ? getPrevFinalKm(
+                                      bookings,
+                                      driveLogs,
+                                      selectedBooking.vehicleId,
+                                      selectedBooking.date,
+                                      selectedBooking.id,
+                                      selectedBooking.startTime,
+                                  )
+                                : null
+                        }
+                        user={{ ...user, uid: user.uid }}
+                    />
+                )}
 
                 {/* FAB */}
-                {view !== 'form' && (
-                    <button
-                        onClick={handleFabClick}
-                        className="fixed sm:absolute bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-700 hover:scale-110 transition-all z-50 group"
-                    >
-                        <span className="text-2xl sm:text-3xl leading-none group-hover:rotate-90 transition-transform duration-300">
-                            +
-                        </span>
-                    </button>
-                )}
+                <FAB
+                    visible={view !== 'form' && view !== 'log'}
+                    onClick={handleFabClick}
+                />
+            
             </div>
         </div>
     );

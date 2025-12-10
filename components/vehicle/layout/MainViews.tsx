@@ -1,4 +1,12 @@
 import React from 'react';
+import {
+    Booking,
+    DriveLog,
+    LogFormState,
+    TimeInputs,
+    VehicleFilter,
+    View,
+} from '@/types/vehicle';
 import { CalendarView } from '@/components/vehicle/views/CalendarView';
 import { DayView } from '@/components/vehicle/views/DayView';
 import { BookingForm } from '@/components/vehicle/views/BookingForm';
@@ -8,39 +16,55 @@ import { LogsListView } from '@/components/vehicle/views/LogsListView';
 import { UserSummaryView } from '@/components/vehicle/views/UserSummaryView';
 
 interface MainViewsProps {
-    view: string;
+    view: View;
     currentDate: Date;
-    bookings: any[];
-    driveLogs: any[];
+    bookings: Booking[];
+    driveLogs: DriveLog[];
     selectedDate: Date;
-    selectedBooking: any | null;
-    formMode: any;
-    timeInputs: any;
-    formData: any;
+    selectedBooking: Booking | null;
+    formMode: 'create' | 'edit' | 'view';
+    timeInputs: TimeInputs;
+    formData: {
+        vehicleId: string;
+        startTime: string;
+        endTime: string;
+        destination: string;
+        purpose: string;
+        requester: string;
+        department: string;
+    };
     defaultDept: string;
     isSubmitting: boolean;
-    vehicleFilter: any;
-    onVehicleFilterChange: (f: any) => void;
+    vehicleFilter: VehicleFilter;
+    onVehicleFilterChange: (f: VehicleFilter) => void;
     onChangeMonth: (d: number) => void;
     onSelectDate: (d: Date) => void;
     onGoToday: () => void;
     onChangeDay: (d: number) => void;
-    onOpenBookingForm: (b: any) => void;
-    onOpenDriveLogForm: (b: any, o?: any) => void;
+    onOpenBookingForm: (b: Booking) => void;
+    onOpenDriveLogForm: (b: Booking, o?: 'list' | 'logs' | 'user') => void;
     onSubmitBooking: () => void;
     onDeleteBooking: () => void;
-    onBackFromForm: (v: any) => void;
-    onChangeFormData: (d: any) => void;
-    onChangeTimeInputs: (t: any) => void;
-    onChangeLogForm: (l: any) => void;
+    onBackFromForm: (v: View) => void;
+    onChangeFormData: (d: {
+        vehicleId: string;
+        startTime: string;
+        endTime: string;
+        destination: string;
+        purpose: string;
+        requester: string;
+        department: string;
+    }) => void;
+    onChangeTimeInputs: (t: TimeInputs) => void;
+    onChangeLogForm: (l: LogFormState) => void;
     onSubmitLog: () => void;
     onBackFromLog: () => void;
-    onDeleteMyBooking: (b: any) => void;
-    onDeleteMyLog: (l: any) => void;
+    onDeleteMyBooking: (b: Booking) => void;
+    onDeleteMyLog: (l: DriveLog) => void;
     checkOverlap: (vId: string, dateStr: string, startT: string, endT: string, excludeId?: string) => boolean;
-    logForm: any;
+    logForm: LogFormState;
     prevKm: number | null;
-    user: any;
+    user: { uid: string; displayName?: string | null; email?: string | null };
 }
 
 export const MainViews: React.FC<MainViewsProps> = ({
@@ -73,6 +97,9 @@ export const MainViews: React.FC<MainViewsProps> = ({
     onBackFromLog,
     onDeleteMyBooking,
     onDeleteMyLog,
+    checkOverlap,
+    logForm,
+    prevKm,
     user,
 }) => {
     return (
@@ -114,7 +141,7 @@ export const MainViews: React.FC<MainViewsProps> = ({
                     onSubmit={onSubmitBooking}
                     onDelete={onDeleteBooking}
                     onBack={onBackFromForm}
-                    userId={user?.uid}
+                    userId={user.uid}
                     checkOverlap={checkOverlap}
                 />
             )}

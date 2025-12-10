@@ -1,16 +1,17 @@
 import React from 'react';
 import { Truck, User as UserIcon, LogOut } from 'lucide-react';
-import { MonthNavigator } from '@/components/vehicle/common/MonthNavigator';
+
+import { View } from '@/types/vehicle';
 
 interface HeaderProps {
     headerTitle: string;
-    user: any;
+    user: { uid?: string; displayName?: string | null; email?: string | null };
     pendingLogCount: number;
     pendingLogBadgeText: string;
     onUserClick: () => void;
     onLogout: () => void;
-    view: string;
-    setView: (v: any) => void;
+    view: View;
+    setView: (v: View) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({

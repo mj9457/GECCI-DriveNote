@@ -16,7 +16,6 @@ interface CalendarViewProps {
 export const CalendarView: React.FC<CalendarViewProps> = ({
     currentDate,
     bookings,
-    selectedDate,
     onChangeMonth,
     onSelectDate,
     onGoToday,

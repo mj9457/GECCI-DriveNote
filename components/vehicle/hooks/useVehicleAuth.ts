@@ -5,7 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, appId } from '@/lib/firebaseClient';
 
 export const useVehicleAuth = () => {
-    const [user, setUser] = useState<any | null>(null);
+    const [user, setUser] = useState<{ uid?: string; displayName?: string; email?: string } | null>(null);
     const [isApproved, setIsApproved] = useState(false);
     const [loading, setLoading] = useState(true);
     const [loginError, setLoginError] = useState<string | null>(null);

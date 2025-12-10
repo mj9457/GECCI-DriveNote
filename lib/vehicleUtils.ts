@@ -15,8 +15,32 @@ export const timeToMinutes = (t: string) => {
     return h * 60 + m;
 };
 
+const safeNumber = (v: unknown): number | null => {
+    if (typeof v === 'number') return v;
+    if (typeof v === 'string' && v.trim() !== '') {
+        const n = Number(v);
+        return Number.isNaN(n) ? null : n;
+    }
+    return null;
+};
+
+const getBookingStartTime = (bookings: Booking[], bookingId?: string) => {
+    if (!bookingId) return '00:00';
+    const b = bookings.find((x) => x.id === bookingId);
+    return b?.startTime || '00:00';
+};
+
+type Booking = {
+    id: string;
+    vehicleId: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    // add other fields as needed
+};
+
 export const checkOverlap = (
-    bookings: Array<any>,
+    bookings: Booking[],
     vId: string,
     dateStr: string,
     startT: string,
@@ -37,9 +61,18 @@ export const checkOverlap = (
     });
 };
 
+
+type DriveLog = {
+    vehicleId: string;
+    date: string;
+    bookingId?: string;
+    finalKm?: number | string;
+    // add other fields as needed
+};
+
 export const getPrevFinalKm = (
-    bookings: Array<any>,
-    driveLogs: Array<any>,
+    bookings: Booking[],
+    driveLogs: DriveLog[],
     vehicleId: string,
     dateStr: string,
     bookingId?: string,
@@ -56,24 +89,18 @@ export const getPrevFinalKm = (
 
             if (!bookingStartTime) return true;
 
-            const relatedBooking = bookings.find((b) => b.id === log.bookingId);
-            const logStart = relatedBooking?.startTime || '00:00';
+            const logStart = getBookingStartTime(bookings, log.bookingId);
             return logStart < bookingStartTime;
         })
         .sort((a, b) => {
             if (a.date !== b.date) return String(a.date).localeCompare(String(b.date));
-            const bookingA = bookings.find((bk) => bk.id === a.bookingId);
-            const bookingB = bookings.find((bk) => bk.id === b.bookingId);
-            const sa = bookingA?.startTime || '00:00';
-            const sb = bookingB?.startTime || '00:00';
+            const sa = getBookingStartTime(bookings, a.bookingId);
+            const sb = getBookingStartTime(bookings, b.bookingId);
             return sa.localeCompare(sb);
         });
 
     if (logs.length === 0) return null;
 
     const last = logs[logs.length - 1];
-    const raw = last.finalKm;
-    if (typeof raw === 'number') return raw;
-    const n = Number(raw as any);
-    return Number.isNaN(n) ? null : n;
+    return safeNumber(last.finalKm);
 };

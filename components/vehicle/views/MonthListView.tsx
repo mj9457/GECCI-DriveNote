@@ -1,6 +1,5 @@
 // components/vehicle/MonthListView.tsx
 import { Booking, DriveLog, VehicleFilter } from '@/types/vehicle';
-import { VEHICLES } from '@/lib/vehicleConstants';
 import { formatDate } from '@/lib/timeUtils';
 import { MonthNavigator } from '@/components/vehicle/common/MonthNavigator';
 import { VehicleFilterSelector } from '@/components/vehicle/common/VehicleFilterSelector';

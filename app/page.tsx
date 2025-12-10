@@ -58,7 +58,7 @@ export default function HomePage() {
         const userDocRef = doc(
           db,
           "artifacts",
-          appId,
+          appId as string,
           "public",
           "data",
           "allowed_users",

@@ -24,6 +24,6 @@ export const db = getFirestore(app);
 
 // __app_id 글로벌 사용 (없으면 default-app-id)
 export const appId =
-    typeof (globalThis as any).__app_id !== "undefined"
-        ? (globalThis as any).__app_id
+    typeof (globalThis as Record<string, unknown>).__app_id !== "undefined"
+        ? (globalThis as Record<string, unknown>).__app_id
         : "default-app-id";

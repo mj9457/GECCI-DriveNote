@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, updateDoc, DocumentData } from 'firebase/firestore';
 import { useCallback } from 'react';
 import { db, appId } from '@/lib/firebaseClient';
 import { Booking, DriveLog } from '@/types/vehicle';
@@ -17,18 +17,18 @@ export const useActions = () => {
                     const bookingRef = doc(
                         db,
                         'artifacts',
-                        appId,
+                        appId as string,
                         'public',
                         'data',
                         'vehicle_bookings',
                         params.id,
                     );
-                    await updateDoc(bookingRef, params.data as any);
+                    await updateDoc(bookingRef, params.data as DocumentData);
                     return { ok: true };
                 } else {
                     await addDoc(
-                        collection(db, 'artifacts', appId, 'public', 'data', 'vehicle_bookings'),
-                        params.data as any,
+                        collection(db, 'artifacts', appId as string, 'public', 'data', 'vehicle_bookings'),
+                        params.data as DocumentData,
                     );
                     return { ok: true };
                 }
@@ -45,7 +45,7 @@ export const useActions = () => {
             const bookingRef = doc(
                 db,
                 'artifacts',
-                appId,
+                appId as string,
                 'public',
                 'data',
                 'vehicle_bookings',
@@ -66,18 +66,18 @@ export const useActions = () => {
                     const logRef = doc(
                         db,
                         'artifacts',
-                        appId,
+                        appId as string,
                         'public',
                         'data',
                         'vehicle_drive_logs',
                         params.id,
                     );
-                    await updateDoc(logRef, params.data as any);
+                    await updateDoc(logRef, params.data as DocumentData);
                     return { ok: true };
                 } else {
                     await addDoc(
-                        collection(db, 'artifacts', appId, 'public', 'data', 'vehicle_drive_logs'),
-                        params.data as any,
+                        collection(db, 'artifacts', appId as string, 'public', 'data', 'vehicle_drive_logs'),
+                        params.data as DocumentData,
                     );
                     return { ok: true };
                 }
@@ -94,7 +94,7 @@ export const useActions = () => {
             const logRef = doc(
                 db,
                 'artifacts',
-                appId,
+                appId as string,
                 'public',
                 'data',
                 'vehicle_drive_logs',
