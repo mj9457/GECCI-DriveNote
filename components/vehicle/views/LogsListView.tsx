@@ -55,7 +55,7 @@ export const LogsListView: React.FC<LogsListViewProps> = ({
         <div className="flex flex-col h-full">
             {/* 헤더 */}
             <div className="flex items-center justify-between px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white shadow-sm">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2">
                     <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
                         {year}년 {month}월 운행일지
                     </h2>
@@ -97,6 +97,9 @@ export const LogsListView: React.FC<LogsListViewProps> = ({
                                 구간(출발 → 도착)
                             </th>
                             <th className="px-2 sm:px-3 py-2 text-center font-medium text-gray-600">
+                                경유지
+                            </th>
+                            <th className="px-2 sm:px-3 py-2 text-center font-medium text-gray-600">
                                 이중주차
                             </th>
                             <th className="px-2 sm:px-3 py-2 text-center font-medium text-gray-600">
@@ -108,7 +111,7 @@ export const LogsListView: React.FC<LogsListViewProps> = ({
                         {filteredLogs.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan={8}
+                                    colSpan={9}
                                     className="px-3 py-8 text-center text-gray-400 text-xs sm:text-sm"
                                 >
                                     해당 월의 운행일지가 없습니다.
@@ -140,7 +143,9 @@ export const LogsListView: React.FC<LogsListViewProps> = ({
                                         className={`${canOpenLogForm ? 'cursor-pointer' : ''} ${isToday
                                             ? 'bg-yellow-50 hover:bg-yellow-100'
                                             : 'hover:bg-gray-50'
-                                            }`}
+                                            }
+                                            border-b border-gray-100 last:border-none
+                                            `}
                                         onClick={() => {
                                             if (!booking) return;
                                             onOpenDriveLogForm(booking, 'logs');
@@ -182,13 +187,23 @@ export const LogsListView: React.FC<LogsListViewProps> = ({
                                             {finalKmDisplay}
                                         </td>
 
-                                        <td className="px-2 py-2">
-                                            {log.from || '미입력'}{' '}
-                                            <span className="text-gray-400">→</span>{' '}
-                                            {log.to || booking?.destination || '미입력'}
+                                        <td className="px-2 py-2 text-center whitespace-nowrap">
+                                            {log.from === log.to ? (
+                                                `${log.from} (동일)` || '미입력'
+                                            ) : (
+                                                <>
+                                                {log.from || '미입력'}{' '}
+                                                <span className="text-gray-400">→</span>{' '}
+                                                {log.to || booking?.destination || '미입력'}
+                                                </>
+                                            )}
                                         </td>
 
-                                        <td className="px-2 py-2 text-center whitespace-nowrap">
+                                        <td className="px-2 py-2 w-[170px]">
+                                            {log.via || '미입력'}{' '}
+                                        </td>
+
+                                        <td className="px-2 py-2 text-center whitespace-nowrap text-red-500">
                                             {log.doubleParking || '-'}
                                         </td>
 
@@ -202,7 +217,7 @@ export const LogsListView: React.FC<LogsListViewProps> = ({
                                                     }}
                                                     className="px-2 py-1 rounded-full text-[10px] sm:text-xs font-semibold border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition-all"
                                                 >
-                                                    보기/수정
+                                                    수정
                                                 </button>
                                             ) : (
                                                 <span className="text-gray-400 text-[10px] sm:text-xs">

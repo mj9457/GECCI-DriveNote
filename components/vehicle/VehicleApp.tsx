@@ -610,6 +610,8 @@ export default function VehicleApp() {
 
     const pendingLogBadgeText = useMemo(() => (pendingLogCount > 9 ? '9+' : pendingLogCount.toString()), [pendingLogCount]);
 
+    const fabVisible = view !== 'form' && view !== 'log' && view !== 'logs';
+
     // ----------------- Render -----------------
 
     if (loading) {
@@ -636,7 +638,7 @@ export default function VehicleApp() {
     return (
         <div className="flex flex-col h-screen bg-gray-100 px-0 sm:px-2 md:px-4 lg:px-8">
             <Toaster position="top-center" richColors closeButton />
-            <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-6xl mx-auto bg-gray-100 md:bg-gray-50 md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2 sm:my-4 md:my-6">
+            <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-7xl mx-auto bg-gray-100 md:bg-gray-50 md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2 sm:my-4 md:my-6">
                 {/* Header */}
                 <Header
                     headerTitle={headerTitle}
@@ -703,13 +705,14 @@ export default function VehicleApp() {
                     />
                 )}
 
-                {/* FAB */}
+             
+            
+            </div>  
+            {/* FAB */}
                 <FAB
-                    visible={view !== 'form' && view !== 'log'}
+                    visible={fabVisible}
                     onClick={handleFabClick}
                 />
-            
-            </div>
         </div>
     );
 }

@@ -14,11 +14,6 @@ export const useVehicleAuth = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
-                setUser({
-                    uid: currentUser.uid,
-                    displayName: currentUser.displayName ?? undefined,
-                    email: currentUser.email ?? undefined,
-                });
                 setLoading(true);
 
                 try {
@@ -32,35 +27,50 @@ export const useVehicleAuth = () => {
                         currentUser.email || '',
                     );
                     const userDoc = await getDoc(userDocRef);
-
+                   
                     if (userDoc.exists()) {
-                        setIsApproved(true);
+                                setIsApproved(true);
+                                const data = userDoc.data() as { department?: string; name?: string };
+                                setUser({
+                                    uid: currentUser.uid,
+                                    email: currentUser.email || undefined,
+                                    displayName: data.name || currentUser.displayName || undefined, 
+                                });
 
-                        const data = userDoc.data() as { department?: string } | undefined;
-                        if (data && typeof data.department === 'string') {
-                            const dept: string = data.department ?? '';
-                            setDefaultDept(dept);
-                        } else {
+                                if (data && typeof data.department === 'string') {
+                                setDefaultDept(data.department);
+                                } else {
+                                setDefaultDept('');
+                                }
+                            } else {
+                                setUser({
+                                    uid: currentUser.uid,
+                                    email: currentUser.email || undefined,
+                                    displayName: currentUser.displayName || undefined,
+                                });
+                                setIsApproved(false);
+                                setDefaultDept('');
+                            }
+                            } catch (e) {
+                            console.error('Auth check failed', e);
+                            setIsApproved(false);
                             setDefaultDept('');
+                            
+                            setUser({
+                                uid: currentUser.uid,
+                                email: currentUser.email || undefined,
+                                displayName: currentUser.displayName || undefined,
+                            });
+                            } finally {
+                            setLoading(false);
+                            }
+                        } else {
+                            setUser(null);
+                            setIsApproved(false);
+                            setDefaultDept('');
+                            setLoading(false);
                         }
-                    } else {
-                        setIsApproved(false);
-                        setDefaultDept('');
-                    }
-                } catch (e) {
-                    console.error('Auth check failed', e);
-                    setIsApproved(false);
-                    setDefaultDept('');
-                } finally {
-                    setLoading(false);
-                }
-            } else {
-                setUser(null);
-                setIsApproved(false);
-                setDefaultDept('');
-                setLoading(false);
-            }
-        });
+                        });
 
         return () => unsubscribe();
     }, []);
@@ -77,7 +87,7 @@ export const useVehicleAuth = () => {
     };
 
     const handleLogout = () => signOut(auth);
-
+    console.log(user);
     return {
         user,
         isApproved,

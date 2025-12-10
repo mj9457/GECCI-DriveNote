@@ -53,7 +53,7 @@ export const MonthListView: React.FC<MonthListViewProps> = ({
         <div className="flex flex-col h-full">
             {/* 헤더 */}
             <div className="flex items-center justify-between px-3 sm:px-4 md:px-6 py-3 sm:py-4 bg-white shadow-sm">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2">
                     <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
                         {year}년 {month}월 배차 신청 목록
                     </h2>
@@ -138,7 +138,9 @@ export const MonthListView: React.FC<MonthListViewProps> = ({
                                         className={`cursor-pointer ${isToday
                                             ? 'bg-yellow-50 hover:bg-yellow-100'
                                             : 'hover:bg-gray-50'
-                                            }`}
+                                            }
+                                            border-b border-gray-100 last:border-none
+                                            `}
                                     >
                                         <td className="px-2 py-2 align-middle text-center whitespace-nowrap">
                                             <span
