@@ -191,6 +191,7 @@ export default function VehicleApp() {
 
         if (view === 'calendar') {
             setSelectedDate(today);
+            setCurrentDate(today);
         } else if (view === 'day') {
             // 유지
         } else if (view === 'list' || view === 'logs' || view === 'user') {
@@ -199,10 +200,11 @@ export default function VehicleApp() {
                 today.getMonth() === currentDate.getMonth()
             ) {
                 setSelectedDate(today);
+                setCurrentDate(today);
             } else {
-                setSelectedDate(
-                    new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
-                );
+                const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                setSelectedDate(firstDay);
+                setCurrentDate(firstDay);
             }
         }
 
@@ -225,6 +227,18 @@ export default function VehicleApp() {
         const newDate = new Date(selectedDate);
         newDate.setDate(newDate.getDate() + delta);
         setSelectedDate(newDate);
+        setCurrentDate(newDate);
+    };
+
+    const handleSelectDateFromCalendar = (date: Date) => {
+        setSelectedDate(date);
+        setCurrentDate(date);
+        setView('day');
+    };
+
+    const handleChangeSelectedDate = (date: Date) => {
+        setSelectedDate(date);
+        setCurrentDate(date);
     };
 
     // 배차 저장
@@ -552,7 +566,9 @@ export default function VehicleApp() {
     // Day / List / User 등에서 배차 클릭 → 폼 열기
     const openBookingForm = (booking: Booking) => {
         const [y, m, d] = booking.date.split('-').map(Number);
-        setSelectedDate(new Date(y, m - 1, d));
+        const bookingDate = new Date(y, m - 1, d);
+        setSelectedDate(bookingDate);
+        setCurrentDate(bookingDate);
 
         setFormData({
             vehicleId: booking.vehicleId,
@@ -669,10 +685,8 @@ export default function VehicleApp() {
                         vehicleFilter={vehicleFilter}
                         onVehicleFilterChange={setVehicleFilter}
                         onChangeMonth={changeMonth}
-                        onSelectDate={(date) => {
-                            setSelectedDate(date);
-                            setView('day');
-                        }}
+                        onSelectDate={handleSelectDateFromCalendar}
+                        onChangeSelectedDate={handleChangeSelectedDate}
                         onGoToday={goToCurrentMonth}
                         onChangeDay={changeDay}
                         onOpenBookingForm={openBookingForm}
