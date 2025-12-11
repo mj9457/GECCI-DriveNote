@@ -193,7 +193,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     };
 
     return (
-        <div className="px-3 sm:px-4 md:px-6 py-4 md:py-6 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto bg-white min-h-full">
+        <div className="px-3 sm:px-4 md:px-6 py-4 md:py-6 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto bg-white min-h-full shadow-2xl">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6 pb-3 sm:pb-4">
                 <button
                     onClick={() => onBack(formViewPrev)}
@@ -208,7 +208,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 {/* 운행 일자 */}
-                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border relative">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-300 relative">
                     <div className="flex items-center gap-1.5 sm:gap-2 text-gray-600 font-medium mb-1">
                         <CalendarIcon size={16} className="sm:w-5 sm:h-5" />
                         <span className="text-sm sm:text-base">운행 일자</span>
@@ -224,7 +224,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                             <button
                                 type="button"
                                 onClick={() => setIsDatePickerOpen((prev) => !prev)}
-                                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border bg-white text-xs sm:text-sm font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-sm transition-all"
+                                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 bg-white text-xs sm:text-sm font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-sm transition-all"
                             >
                                 <CalendarIcon size={16} className="text-blue-600" />
                                 <span>달력으로 변경</span>
@@ -320,7 +320,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                                                     type="button"
                                                     key={day}
                                                     onClick={() => handleSelectDay(day)}
-                                                    className={`flex items-center justify-center h-9 rounded-lg text-sm font-semibold transition-all border ${isSelected
+                                                    className={`flex items-center justify-center h-11 rounded-lg text-sm font-semibold transition-all ${isSelected
                                                         ? 'bg-blue-600 text-white border-blue-600 shadow-md'
                                                         : isToday
                                                             ? 'border-blue-200 text-blue-700 bg-blue-50'
@@ -357,7 +357,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                         <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                             신청자
                         </label>
-                        <div className="relative">
+                        <div className="relative ">
                             <User className="absolute left-2.5 sm:left-3 top-2.5 sm:top-3.5 text-gray-400" size={16} />
                             <input
                                 type="text"
@@ -367,7 +367,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                                     onChangeFormData({ ...formData, requester: e.target.value })
                                 }
                                 placeholder="신청자 이름 또는 아이디"
-                                className="w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                className="w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                             />
                         </div>
                     </div>
@@ -382,7 +382,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                             onChange={(e) =>
                                 onChangeFormData({ ...formData, department: e.target.value })
                             }
-                            className={`w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
+                            className={`w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
                                 ? 'bg-gray-50 text-gray-600 appearance-none cursor-default'
                                 : 'bg-white focus:ring-2 focus:ring-blue-500'
                                 }`}
@@ -411,7 +411,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                             <label
                                 key={v.id}
                                 className={`
-                  flex items-center p-2.5 sm:p-3 border rounded-lg transition-all text-xs sm:text-sm
+                  flex items-center p-2.5 sm:p-3 border border-gray-300 rounded-lg transition-all text-xs sm:text-sm
                   ${formData.vehicleId === v.id
                                         ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500'
                                         : 'hover:bg-gray-50'
@@ -477,7 +477,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                                 }
                             }}
                             placeholder="예: 09:00 또는 900"
-                            className={`w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
+                            className={`w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
                                 ? 'bg-gray-50 text-gray-600 cursor-default'
                                 : 'bg-white focus:ring-2 focus:ring-blue-500'
                                 }`}
@@ -507,7 +507,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                                 }
                             }}
                             placeholder="예: 12:30 또는 1230"
-                            className={`w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
+                            className={`w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
                                 ? 'bg-gray-50 text-gray-600 cursor-default'
                                 : 'bg-white focus:ring-2 focus:ring-blue-500'
                                 }`}
@@ -647,7 +647,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                                     destination: e.target.value,
                                 })
                             }
-                            className={`w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
+                            className={`w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${isReadOnly
                                 ? 'bg-gray-100 text-gray-500 cursor-default appearance-none'
                                 : 'bg-white focus:ring-2 focus:ring-blue-500'
                                 }`}
@@ -677,7 +677,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                             onChange={(e) =>
                                 onChangeFormData({ ...formData, purpose: e.target.value })
                             }
-                            className="w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                     </div>
                 </div>

@@ -58,7 +58,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
             </div>
 
             {/* 배차 기본정보 */}
-            <div className="bg-gray-50 border rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 text-[11px] sm:text-xs md:text-sm space-y-1.5">
+            <div className="bg-gray-50 border border-gray-300 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 text-[11px] sm:text-xs md:text-sm space-y-1.5">
                 <div>
                     <span className="font-semibold text-gray-700">운행날짜 : </span>
                     {dateStr}
@@ -103,7 +103,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                 onChangeLogForm({ ...logForm, from: e.target.value })
                             }
                             placeholder="예) 다남프라자"
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300  rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div>
@@ -117,7 +117,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                 onChangeLogForm({ ...logForm, via: e.target.value })
                             }
                             placeholder="예) 남양주시청"
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div>
@@ -131,7 +131,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                 onChangeLogForm({ ...logForm, to: e.target.value })
                             }
                             placeholder="예) 다남프라자"
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
@@ -146,7 +146,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                             type="text"
                             readOnly
                             value={prevKmDisplay}
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm bg-gray-50 text-gray-600"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm bg-gray-50 text-gray-600"
                         />
                     </div>
 
@@ -162,7 +162,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                     onChangeLogForm({ ...logForm, finalKm: e.target.value })
                                 }
                                 placeholder="숫자만 입력"
-                                className="flex-1 p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <span className="text-xs sm:text-sm text-gray-500">km</span>
                         </div>
@@ -181,7 +181,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                     : ''
                             }
                             placeholder="현재 최종키로수 입력하세요"
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm bg-gray-50 text-gray-700"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm bg-gray-50 text-gray-700"
                         />
                     </div>
                 </div>
@@ -199,7 +199,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                 onChangeLogForm({ ...logForm, purpose: e.target.value })
                             }
                             placeholder="예) 회의"
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div>
@@ -213,7 +213,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                 onChangeLogForm({ ...logForm, driver: e.target.value })
                             }
                             placeholder="예) 운전자1, 동승자1"
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
@@ -232,7 +232,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                     doubleParking: e.target.value,
                                 })
                             }
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none bg-white focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none bg-white focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">선택하세요</option>
                             {isCarnival ? (
@@ -268,7 +268,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                                 onChangeLogForm({ ...logForm, note: e.target.value })
                             }
                             placeholder="예) 엔진 경고등 점등, 주유 필요 등"
-                            className="w-full p-2.5 sm:p-3 border rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
