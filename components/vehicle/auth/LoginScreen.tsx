@@ -1,5 +1,5 @@
 // components/vehicle/LoginScreen.tsx
-import { AlertCircle, Truck } from 'lucide-react';
+import { AlertCircle, Car } from 'lucide-react';
 
 interface LoginScreenProps {
     onLogin: () => void;
@@ -10,7 +10,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, error }) => (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
         <div className="bg-white px-6 py-8 sm:px-8 sm:py-10 rounded-2xl shadow-xl w-full max-w-sm sm:max-w-md lg:max-w-lg text-center">
             <div className="bg-blue-100 p-4 rounded-full inline-block mb-4">
-                <Truck className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+                <Car className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
             </div>
             <div className="flex flex-col items-center">
                 <img
