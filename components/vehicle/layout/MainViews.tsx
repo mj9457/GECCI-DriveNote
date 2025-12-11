@@ -39,6 +39,7 @@ interface MainViewsProps {
     onVehicleFilterChange: (f: VehicleFilter) => void;
     onChangeMonth: (d: number) => void;
     onSelectDate: (d: Date) => void;
+    onChangeSelectedDate: (d: Date) => void;
     onGoToday: () => void;
     onChangeDay: (d: number) => void;
     onOpenBookingForm: (b: Booking) => void;
@@ -83,6 +84,7 @@ export const MainViews: React.FC<MainViewsProps> = ({
     onVehicleFilterChange,
     onChangeMonth,
     onSelectDate,
+    onChangeSelectedDate,
     onGoToday,
     onChangeDay,
     onOpenBookingForm,
@@ -141,6 +143,7 @@ export const MainViews: React.FC<MainViewsProps> = ({
                     onSubmit={onSubmitBooking}
                     onDelete={onDeleteBooking}
                     onBack={onBackFromForm}
+                    onChangeDate={onChangeSelectedDate}
                     user={user}
                     checkOverlap={checkOverlap}
                 />

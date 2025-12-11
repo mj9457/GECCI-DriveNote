@@ -3,6 +3,7 @@ import {
     AlertCircle,
     Calendar as CalendarIcon,
     ChevronLeft,
+    ChevronRight,
     FileText,
     MapPin,
     User,
@@ -11,7 +12,7 @@ import { Booking, TimeInputs, View } from '@/types/vehicle';
 import { VEHICLES } from '@/lib/vehicleConstants';
 import { formatDate, normalizeTimeInput } from '@/lib/timeUtils';
 import { toast } from 'sonner';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface BookingFormProps {
     mode: 'create' | 'edit' | 'view';
@@ -36,6 +37,7 @@ interface BookingFormProps {
     onSubmit: () => void;
     onDelete: () => void;
     onBack: (view: View) => void;
+    onChangeDate: (date: Date) => void;
     user: { uid: string; displayName?: string | null; email?: string | null; role?: string; };
     checkOverlap: (
         vehicleId: string,
@@ -61,10 +63,18 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     onSubmit,
     onDelete,
     onBack,
+    onChangeDate,
     user,
     checkOverlap,
 }) => {
     const isReadOnly = mode === 'view';
+
+    const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [pickerMonth, setPickerMonth] = useState<Date>(selectedDate);
+
+    useEffect(() => {
+        setPickerMonth(selectedDate);
+    }, [selectedDate]);
 
     const excludeId = mode === 'edit' && selectedBooking ? selectedBooking.id : undefined;
 
@@ -159,6 +169,29 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
     const effectiveDept = formData.department || defaultDept || '';
 
+    const blanks = useMemo(
+        () => Array(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), 1).getDay()).fill(null),
+        [pickerMonth],
+    );
+
+    const daysInMonth = useMemo(
+        () => new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() + 1, 0).getDate(),
+        [pickerMonth],
+    );
+
+    const handleSelectDay = (day: number) => {
+        const nextDate = new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), day);
+        onChangeDate(nextDate);
+        setIsDatePickerOpen(false);
+    };
+
+    const handleToday = () => {
+        const today = new Date();
+        setPickerMonth(today);
+        onChangeDate(today);
+        setIsDatePickerOpen(false);
+    };
+
     return (
         <div className="px-3 sm:px-4 md:px-6 py-4 md:py-6 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto bg-white min-h-full">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6 pb-3 sm:pb-4">
@@ -175,7 +208,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 {/* 운행 일자 */}
-                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border relative">
                     <div className="flex items-center gap-1.5 sm:gap-2 text-gray-600 font-medium mb-1">
                         <CalendarIcon size={16} className="sm:w-5 sm:h-5" />
                         <span className="text-sm sm:text-base">운행 일자</span>
@@ -186,7 +219,136 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                             {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월{' '}
                             {selectedDate.getDate()}일
                         </div>
+
+                        {!isReadOnly && (
+                            <button
+                                type="button"
+                                onClick={() => setIsDatePickerOpen((prev) => !prev)}
+                                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border bg-white text-xs sm:text-sm font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-sm transition-all"
+                            >
+                                <CalendarIcon size={16} className="text-blue-600" />
+                                <span>달력으로 변경</span>
+                            </button>
+                        )}
                     </div>
+
+                    {!isReadOnly && isDatePickerOpen && (
+                        <>
+                            <div
+                                className="fixed inset-0 z-30"
+                                onClick={() => setIsDatePickerOpen(false)}
+                            />
+                            <div className="absolute right-2 top-full mt-2 z-40 w-full max-w-xs sm:max-w-sm">
+                                <div className="bg-white border rounded-xl shadow-2xl p-3 sm:p-4 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <button
+                                            type="button"
+                                            className="p-2 rounded-lg hover:bg-gray-100"
+                                            onClick={() =>
+                                                setPickerMonth(
+                                                    (prev) =>
+                                                        new Date(
+                                                            prev.getFullYear(),
+                                                            prev.getMonth() - 1,
+                                                            1,
+                                                        ),
+                                                )
+                                            }
+                                        >
+                                            <ChevronLeft className="w-4 h-4 text-gray-600" />
+                                        </button>
+                                        <div className="text-sm sm:text-base font-semibold text-gray-800">
+                                            {pickerMonth.getFullYear()}년 {pickerMonth.getMonth() + 1}월
+                                        </div>
+                                        <button
+                                            type="button"
+                                            className="p-2 rounded-lg hover:bg-gray-100"
+                                            onClick={() =>
+                                                setPickerMonth(
+                                                    (prev) =>
+                                                        new Date(
+                                                            prev.getFullYear(),
+                                                            prev.getMonth() + 1,
+                                                            1,
+                                                        ),
+                                                )
+                                            }
+                                        >
+                                            <ChevronRight className="w-4 h-4 text-gray-600" />
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-7 gap-1 text-[11px] sm:text-xs text-center text-gray-500 font-semibold">
+                                        <div className="text-red-500">일</div>
+                                        <div>월</div>
+                                        <div>화</div>
+                                        <div>수</div>
+                                        <div>목</div>
+                                        <div>금</div>
+                                        <div className="text-blue-500">토</div>
+                                    </div>
+
+                                    <div className="grid grid-cols-7 gap-1 text-center">
+                                        {blanks.map((_, idx) => (
+                                            <div key={`blank-${idx}`} className="h-9" />
+                                        ))}
+
+                                        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
+                                            const cellDate = new Date(
+                                                pickerMonth.getFullYear(),
+                                                pickerMonth.getMonth(),
+                                                day,
+                                            );
+
+                                            const isSelected =
+                                                selectedDate.getFullYear() ===
+                                                    cellDate.getFullYear() &&
+                                                selectedDate.getMonth() === cellDate.getMonth() &&
+                                                selectedDate.getDate() === cellDate.getDate();
+
+                                            const isToday = (() => {
+                                                const today = new Date();
+                                                return (
+                                                    today.getFullYear() === cellDate.getFullYear() &&
+                                                    today.getMonth() === cellDate.getMonth() &&
+                                                    today.getDate() === cellDate.getDate()
+                                                );
+                                            })();
+
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    key={day}
+                                                    onClick={() => handleSelectDay(day)}
+                                                    className={`flex items-center justify-center h-9 rounded-lg text-sm font-semibold transition-all border ${isSelected
+                                                        ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                                                        : isToday
+                                                            ? 'border-blue-200 text-blue-700 bg-blue-50'
+                                                            : 'text-gray-700 bg-white hover:bg-blue-50'}
+                                                    ${isSelected ? 'hover:bg-blue-600' : ''}`}
+                                                >
+                                                    {day}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    <div className="flex items-center justify-between gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleToday}
+                                            className="text-[12px] sm:text-xs text-blue-600 font-medium hover:underline"
+                                        >
+                                            오늘 날짜로 이동
+                                        </button>
+                                        <div className="text-[11px] sm:text-xs text-gray-500">
+                                            선택된 날짜: {formatDate(selectedDate)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* 신청자 / 부서 */}
