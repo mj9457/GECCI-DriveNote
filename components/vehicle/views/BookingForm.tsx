@@ -36,7 +36,7 @@ interface BookingFormProps {
     onSubmit: () => void;
     onDelete: () => void;
     onBack: (view: View) => void;
-    userId: string;
+    user: { uid: string; displayName?: string | null; email?: string | null; role?: string; };
     checkOverlap: (
         vehicleId: string,
         dateStr: string,
@@ -61,7 +61,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     onSubmit,
     onDelete,
     onBack,
-    userId,
+    user,
     checkOverlap,
 }) => {
     const isReadOnly = mode === 'view';
@@ -546,17 +546,17 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                     </button>
                 )}
 
-                {mode === 'edit' &&
-                    selectedBooking &&
-                    selectedBooking.userId === userId && (
-                        <button
-                            type="button"
-                            onClick={onDelete}
-                            className="w-full mt-2 sm:mt-3 py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base text-white bg-red-500 hover:bg-red-600 shadow-md hover:shadow-lg transition-all"
-                        >
-                            이 배차 일정 삭제하기
-                        </button>
-                    )}
+               {mode === 'edit' &&
+                selectedBooking &&
+                (selectedBooking.userId === user.uid || user.role === 'admin') && (
+                    <button
+                        type="button"
+                        onClick={onDelete}
+                        className="w-full mt-2 sm:mt-3 py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base text-white bg-red-500 hover:bg-red-600 shadow-md hover:shadow-lg transition-all"
+                    >
+                        이 배차 일정 삭제하기
+                    </button>
+                )}
             </form>
         </div>
     );

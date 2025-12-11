@@ -107,7 +107,7 @@ export default function VehicleApp() {
         setFormData((prev) => ({
             ...prev,
             requester:
-                prev.requester || user.displayName || user.email || user.uid || '',
+                prev.requester || user.displayName || user.email || user.uid || user.role || '',
         }));
     }, [user]);
 
@@ -183,7 +183,7 @@ export default function VehicleApp() {
             destination: '',
             purpose: '',
             requester:
-                user?.displayName || user?.email || user?.uid || '',
+                user?.displayName || user?.email || user?.uid || user?.role ||'',
             department: defaultDept || '',
         });
 
@@ -358,43 +358,44 @@ export default function VehicleApp() {
     };
 
     const handleDeleteBooking = async () => {
-        if (!selectedBooking || !user) return;
+    if (!selectedBooking || !user) return;
 
-        if (selectedBooking.userId !== user.uid) {
-            toast.error('삭제 권한이 없습니다.', {
-                description: '본인이 신청한 배차만 삭제할 수 있습니다.',
-            });
-            return;
+    if (selectedBooking.userId !== user.uid && user.role !== 'admin') {
+        toast.error('삭제 권한이 없습니다.', {
+            description: '본인 또는 관리자만 삭제할 수 있습니다.',
+        });
+        return;
+    }
+
+    const ok = window.confirm('정말 이 배차 일정을 삭제하시겠습니까?');
+    if (!ok) return;
+
+    try {
+        const res = await actionDeleteBooking(selectedBooking.id);
+        if (res.ok) {
+            toast.success('배차 예약이 삭제되었습니다.');
+            setSelectedBooking(null);
+            setFormMode('create');
+            setView('day');
+        } else {
+            throw res.error;
         }
+    } catch (err) {
+        console.error(err);
+        toast.error('삭제 중 오류가 발생했습니다.', {
+            description: '잠시 후 다시 시도해 주세요.',
+        });
+    }
+};
 
-        const ok = window.confirm('정말 이 배차 일정을 삭제하시겠습니까?');
-        if (!ok) return;
-
-        try {
-            const res = await actionDeleteBooking(selectedBooking.id);
-            if (res.ok) {
-                toast.success('배차 예약이 삭제되었습니다.');
-                setSelectedBooking(null);
-                setFormMode('create');
-                setView('day');
-            } else {
-                throw res.error;
-            }
-        } catch (err) {
-            console.error(err);
-            toast.error('삭제 중 오류가 발생했습니다.', {
-                description: '잠시 후 다시 시도해 주세요.',
-            });
-        }
-    };
 
     // 내 배차에서 개별 삭제
     const handleDeleteMyBooking = async (booking: Booking) => {
         if (!user) return;
 
-        if (booking.userId !== user.uid) {
+        if (booking.userId !== user.uid && user.role !== 'admin') {
             toast.error('삭제 권한이 없습니다.', {
-                description: '본인이 신청한 배차만 삭제할 수 있습니다.',
+                description: '본인 또는 관리자만 삭제할 수 있습니다.',
             });
             return;
         }
@@ -423,6 +424,7 @@ export default function VehicleApp() {
             });
         }
     };
+
 
     // 내 운행일지 삭제
     const handleDeleteMyLog = async (log: DriveLog) => {
@@ -565,7 +567,7 @@ export default function VehicleApp() {
         setSelectedBooking(booking);
         setPrevView(view);
 
-        if (user && booking.userId === user.uid) {
+        if (user && (booking.userId === user.uid || user.role === 'admin')) {
             setFormMode('edit');
         } else {
             setFormMode('view');

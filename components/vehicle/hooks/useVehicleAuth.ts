@@ -5,7 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, appId } from '@/lib/firebaseClient';
 
 export const useVehicleAuth = () => {
-    const [user, setUser] = useState<{ uid?: string; displayName?: string; email?: string } | null>(null);
+    const [user, setUser] = useState<{ uid?: string; displayName?: string; email?: string; role?: string; } | null>(null);
     const [isApproved, setIsApproved] = useState(false);
     const [loading, setLoading] = useState(true);
     const [loginError, setLoginError] = useState<string | null>(null);
@@ -27,14 +27,16 @@ export const useVehicleAuth = () => {
                         currentUser.email || '',
                     );
                     const userDoc = await getDoc(userDocRef);
-                   
+
                     if (userDoc.exists()) {
                                 setIsApproved(true);
-                                const data = userDoc.data() as { department?: string; name?: string };
+                                const data = userDoc.data() as { department?: string; name?: string; role?: string; };
+
                                 setUser({
                                     uid: currentUser.uid,
                                     email: currentUser.email || undefined,
                                     displayName: data.name || currentUser.displayName || undefined, 
+                                    role: data.role || undefined
                                 });
 
                                 if (data && typeof data.department === 'string') {
@@ -47,6 +49,7 @@ export const useVehicleAuth = () => {
                                     uid: currentUser.uid,
                                     email: currentUser.email || undefined,
                                     displayName: currentUser.displayName || undefined,
+                                    role: undefined
                                 });
                                 setIsApproved(false);
                                 setDefaultDept('');
@@ -60,6 +63,7 @@ export const useVehicleAuth = () => {
                                 uid: currentUser.uid,
                                 email: currentUser.email || undefined,
                                 displayName: currentUser.displayName || undefined,
+                                role: undefined
                             });
                             } finally {
                             setLoading(false);
@@ -87,7 +91,7 @@ export const useVehicleAuth = () => {
     };
 
     const handleLogout = () => signOut(auth);
-    console.log(user);
+
     return {
         user,
         isApproved,

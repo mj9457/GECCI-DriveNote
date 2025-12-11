@@ -64,7 +64,7 @@ interface MainViewsProps {
     checkOverlap: (vId: string, dateStr: string, startT: string, endT: string, excludeId?: string) => boolean;
     logForm: LogFormState;
     prevKm: number | null;
-    user: { uid: string; displayName?: string | null; email?: string | null };
+    user: { uid: string; displayName?: string | null; email?: string; role?: string};
 }
 
 export const MainViews: React.FC<MainViewsProps> = ({
@@ -141,7 +141,7 @@ export const MainViews: React.FC<MainViewsProps> = ({
                     onSubmit={onSubmitBooking}
                     onDelete={onDeleteBooking}
                     onBack={onBackFromForm}
-                    userId={user.uid}
+                    user={user}
                     checkOverlap={checkOverlap}
                 />
             )}
