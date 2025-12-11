@@ -31,15 +31,12 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
 }) => {
   const dateStr = booking.date || formatDate(new Date());
 
-  const prevKmDisplay =
-    prevKm != null ? `${prevKm.toLocaleString()} km` : '이전 운행 기록 없음';
+  const prevKmDisplay = prevKm != null ? `${prevKm.toLocaleString()} km` : '이전 운행 기록 없음';
 
   const finalKmNum = Number(logForm.finalKm || 0);
-  const distanceKm =
-    prevKm != null && finalKmNum > prevKm ? finalKmNum - prevKm : 0;
+  const distanceKm = prevKm != null && finalKmNum > prevKm ? finalKmNum - prevKm : 0;
 
-  const vehicleLabel =
-    VEHICLES.find((v) => v.id === booking.vehicleId)?.number || '';
+  const vehicleLabel = VEHICLES.find((v) => v.id === booking.vehicleId)?.number || '';
 
   const isCarnival = booking.vehicleId === 'v2';
 
@@ -51,11 +48,8 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
   // 공통 input 스타일 (밑줄형)
   const underlineInputBase =
     'w-full px-0 py-2.5 sm:py-3 border-0 border-b-2 text-sm sm:text-base outline-none bg-transparent';
-  const underlineInput =
-    underlineInputBase +
-    ' border-gray-300 focus:border-blue-500 focus:ring-0';
-  const underlineReadOnly =
-    underlineInputBase + ' border-dashed border-gray-300 text-gray-600';
+  const underlineInput = underlineInputBase + ' border-gray-300 focus:border-blue-500 focus:ring-0';
+  const underlineReadOnly = underlineInputBase + ' border-dashed border-gray-300 text-gray-600';
 
   return (
     <div className="px-3 sm:px-4 md:px-6 py-4 md:py-6 max-w-5xl mx-auto bg-white min-h-full">
@@ -68,9 +62,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
           >
             <ChevronLeft size={22} className="sm:w-6 sm:h-6" />
           </button>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
-            운행일지 작성
-          </h2>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">운행일지 작성</h2>
         </div>
       </div>
 
@@ -81,9 +73,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
             <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-blue-900">
-              배차 기본정보
-            </h3>
+            <h3 className="text-sm sm:text-base font-semibold text-blue-900">배차 기본정보</h3>
             <p className="text-xs sm:text-sm text-blue-800/80">
               운행일지 작성 전, 배차 내역을 다시 한 번 확인해 주세요.
             </p>
@@ -97,12 +87,8 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <CalendarIcon className="w-4 h-4 text-blue-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">
-                운행날짜
-              </span>
-              <span className="mt-1 font-semibold text-gray-900">
-                {dateStr}
-              </span>
+              <span className="text-xs sm:text-sm text-gray-500 font-medium">운행날짜</span>
+              <span className="mt-1 font-semibold text-gray-900">{dateStr}</span>
             </div>
           </div>
 
@@ -112,9 +98,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <Car className="w-4 h-4 text-emerald-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">
-                운행차량
-              </span>
+              <span className="text-xs sm:text-sm text-gray-500 font-medium">운행차량</span>
               <span className="mt-1 font-semibold text-gray-900">
                 {vehicleLabel}
                 <span className="ml-1 text-xs sm:text-sm text-gray-500">
@@ -130,9 +114,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <Clock4 className="w-4 h-4 text-orange-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">
-                운행시간
-              </span>
+              <span className="text-xs sm:text-sm text-gray-500 font-medium">운행시간</span>
               <span className="mt-1 font-semibold text-gray-900">
                 {booking.startTime} ~ {booking.endTime}
               </span>
@@ -145,9 +127,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <User className="w-4 h-4 text-purple-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">
-                신청자 / 부서
-              </span>
+              <span className="text-xs sm:text-sm text-gray-500 font-medium">신청자 / 부서</span>
               <span className="mt-1 font-semibold text-gray-900">
                 {booking.requester || booking.userName || '-'}
                 {booking.department && (
@@ -165,12 +145,8 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <MapPin className="w-4 h-4 text-red-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">
-                출장지역
-              </span>
-              <span className="mt-1 font-semibold text-gray-900">
-                {booking.destination || '-'}
-              </span>
+              <span className="text-xs sm:text-sm text-gray-500 font-medium">출장지역</span>
+              <span className="mt-1 font-semibold text-gray-900">{booking.destination || '-'}</span>
             </div>
           </div>
 
@@ -180,12 +156,8 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <FileText className="w-4 h-4 text-sky-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">
-                사용목적
-              </span>
-              <span className="mt-1 font-semibold text-gray-900">
-                {booking.purpose || '-'}
-              </span>
+              <span className="text-xs sm:text-sm text-gray-500 font-medium">사용목적</span>
+              <span className="mt-1 font-semibold text-gray-900">{booking.purpose || '-'}</span>
             </div>
           </div>
         </div>
@@ -194,9 +166,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
       {/* 🔻 여기서부터 운행일지 입력 영역 ― 배차 카드와 시각적으로 분리 */}
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <div className="mb-2 sm:mb-3">
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900">
-            운행일지 입력
-          </h3>
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900">운행일지 입력</h3>
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             실제 운행 경로, 키로수, 특이사항을 정확히 입력해 주세요.
           </p>
@@ -212,9 +182,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <input
                 type="text"
                 value={logForm.from}
-                onChange={(e) =>
-                  onChangeLogForm({ ...logForm, from: e.target.value })
-                }
+                onChange={(e) => onChangeLogForm({ ...logForm, from: e.target.value })}
                 placeholder="예) 다남프라자"
                 className={underlineInput}
               />
@@ -226,9 +194,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <input
                 type="text"
                 value={logForm.via}
-                onChange={(e) =>
-                  onChangeLogForm({ ...logForm, via: e.target.value })
-                }
+                onChange={(e) => onChangeLogForm({ ...logForm, via: e.target.value })}
                 placeholder="예) 남양주시청"
                 className={underlineInput}
               />
@@ -240,9 +206,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <input
                 type="text"
                 value={logForm.to}
-                onChange={(e) =>
-                  onChangeLogForm({ ...logForm, to: e.target.value })
-                }
+                onChange={(e) => onChangeLogForm({ ...logForm, to: e.target.value })}
                 placeholder="예) 다남프라자"
                 className={underlineInput}
               />
@@ -255,12 +219,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
                 이전 최종키로수
               </label>
-              <input
-                type="text"
-                readOnly
-                value={prevKmDisplay}
-                className={underlineReadOnly}
-              />
+              <input type="text" readOnly value={prevKmDisplay} className={underlineReadOnly} />
             </div>
 
             <div>
@@ -271,9 +230,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                 <input
                   type="number"
                   value={logForm.finalKm}
-                  onChange={(e) =>
-                    onChangeLogForm({ ...logForm, finalKm: e.target.value })
-                  }
+                  onChange={(e) => onChangeLogForm({ ...logForm, finalKm: e.target.value })}
                   placeholder="숫자만 입력"
                   className={underlineInput + ' flex-1'}
                 />
@@ -288,11 +245,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <input
                 type="text"
                 readOnly
-                value={
-                  logForm.finalKm && prevKm != null
-                    ? `${distanceKm.toLocaleString()} km`
-                    : ''
-                }
+                value={logForm.finalKm && prevKm != null ? `${distanceKm.toLocaleString()} km` : ''}
                 placeholder="현재 최종키로수 입력 후 자동 계산"
                 className={underlineReadOnly}
               />
@@ -308,9 +261,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <input
                 type="text"
                 value={logForm.purpose}
-                onChange={(e) =>
-                  onChangeLogForm({ ...logForm, purpose: e.target.value })
-                }
+                onChange={(e) => onChangeLogForm({ ...logForm, purpose: e.target.value })}
                 placeholder="예) 회의, 시찰, 교육 등"
                 className={underlineInput}
               />
@@ -322,9 +273,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <input
                 type="text"
                 value={logForm.driver}
-                onChange={(e) =>
-                  onChangeLogForm({ ...logForm, driver: e.target.value })
-                }
+                onChange={(e) => onChangeLogForm({ ...logForm, driver: e.target.value })}
                 placeholder="예) 운전자1, 동승자1"
                 className={underlineInput}
               />
@@ -345,18 +294,13 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                     doubleParking: e.target.value,
                   })
                 }
-                className={
-                  underlineInput +
-                  ' bg-transparent pr-6 cursor-pointer appearance-none'
-                }
+                className={underlineInput + ' bg-transparent pr-6 cursor-pointer appearance-none'}
               >
                 <option value="">선택하세요</option>
                 {isCarnival ? (
                   <>
                     <option value="일반주차">일반주차</option>
-                    <option value="이중주차(기어중립)">
-                      이중주차(기어중립)
-                    </option>
+                    <option value="이중주차(기어중립)">이중주차(기어중립)</option>
                   </>
                 ) : (
                   <>
@@ -376,9 +320,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <input
                 type="text"
                 value={logForm.note}
-                onChange={(e) =>
-                  onChangeLogForm({ ...logForm, note: e.target.value })
-                }
+                onChange={(e) => onChangeLogForm({ ...logForm, note: e.target.value })}
                 placeholder="예) 엔진 경고등 점등, 주유 필요 등"
                 className={underlineInput}
               />

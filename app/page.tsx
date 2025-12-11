@@ -1,32 +1,24 @@
 // app/page.tsx
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
   signOut,
   User,
-} from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db, appId } from "@/lib/firebaseClient";
+} from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db, appId } from '@/lib/firebaseClient';
 
-import {
-  Car,
-  Clock4,
-  ShieldCheck,
-  Users,
-  LogIn,
-  LogOut,
-  AlertCircle,
-} from "lucide-react";
+import { Car, Clock4, ShieldCheck, Users, LogIn, LogOut, AlertCircle } from 'lucide-react';
 
-type UserRole = "admin" | "staff" | "pending" | "none";
+type UserRole = 'admin' | 'staff' | 'pending' | 'none';
 
 interface AllowedUserData {
-  role?: "admin" | "staff";
+  role?: 'admin' | 'staff';
   department?: string;
 }
 
@@ -34,8 +26,8 @@ export default function HomePage() {
   const router = useRouter();
 
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
-  const [role, setRole] = useState<UserRole>("none");
-  const [department, setDepartment] = useState<string>("");
+  const [role, setRole] = useState<UserRole>('none');
+  const [department, setDepartment] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [checkingRole, setCheckingRole] = useState(false);
 
@@ -44,8 +36,8 @@ export default function HomePage() {
     const unsub = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (!user) {
-        setRole("none");
-        setDepartment("");
+        setRole('none');
+        setDepartment('');
         setLoading(false);
         return;
       }
@@ -57,26 +49,26 @@ export default function HomePage() {
         // Vehicle 시스템과 동일한 경로
         const userDocRef = doc(
           db,
-          "artifacts",
+          'artifacts',
           appId as string,
-          "public",
-          "data",
-          "allowed_users",
-          user.email || ""
+          'public',
+          'data',
+          'allowed_users',
+          user.email || ''
         );
         const snap = await getDoc(userDocRef);
 
         if (snap.exists()) {
           const data = snap.data() as AllowedUserData;
-          setRole(data.role === "admin" ? "admin" : "staff");
-          setDepartment(data.department ?? "");
+          setRole(data.role === 'admin' ? 'admin' : 'staff');
+          setDepartment(data.department ?? '');
         } else {
           // 로그인은 했지만 승인 목록에는 없음
-          setRole("pending");
+          setRole('pending');
         }
       } catch (e) {
-        console.error("권한 확인 실패:", e);
-        setRole("none");
+        console.error('권한 확인 실패:', e);
+        setRole('none');
       } finally {
         setLoading(false);
         setCheckingRole(false);
@@ -92,7 +84,7 @@ export default function HomePage() {
       await signInWithPopup(auth, provider);
     } catch (e) {
       console.error(e);
-      alert("로그인 중 오류가 발생했습니다.");
+      alert('로그인 중 오류가 발생했습니다.');
     }
   };
 
@@ -109,42 +101,42 @@ export default function HomePage() {
   /** 차량 운행 관리 진입 */
   const handleVehicleClick = () => {
     if (!firebaseUser) {
-      alert("로그인 후 이용 가능합니다.");
+      alert('로그인 후 이용 가능합니다.');
       return;
     }
 
-    if (role === "pending") {
-      alert("관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.");
+    if (role === 'pending') {
+      alert('관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.');
       return;
     }
 
-    if (role === "none") {
-      alert("접근 권한이 없습니다. 관리자에게 문의해 주세요.");
+    if (role === 'none') {
+      alert('접근 권한이 없습니다. 관리자에게 문의해 주세요.');
       return;
     }
 
-    router.push("/vehicle");
+    router.push('/vehicle');
   };
 
   /** 연장근로 신청 (추후 개발 예정) */
   const handleOvertimeClick = () => {
     if (!firebaseUser) {
-      alert("로그인 후 이용 가능합니다.");
+      alert('로그인 후 이용 가능합니다.');
       return;
     }
-    alert("연장근로신청 기능은 추후 개발 예정입니다.");
+    alert('연장근로신청 기능은 추후 개발 예정입니다.');
   };
 
   /** 관리자용: 사용자 승인 관리 (추후) */
   const handleUserManageClick = () => {
-    if (role !== "admin") return;
-    alert("사용자 승인 관리 기능은 추후 개발 예정입니다.");
+    if (role !== 'admin') return;
+    alert('사용자 승인 관리 기능은 추후 개발 예정입니다.');
   };
 
   /** 관리자용: 시스템 설정 (추후) */
   const handleSystemConfigClick = () => {
-    if (role !== "admin") return;
-    alert("시스템 설정 기능은 추후 개발 예정입니다.");
+    if (role !== 'admin') return;
+    alert('시스템 설정 기능은 추후 개발 예정입니다.');
   };
 
   // --- UI ---
@@ -161,7 +153,7 @@ export default function HomePage() {
   }
 
   const isLoggedIn = !!firebaseUser;
-  const isApproved = role === "admin" || role === "staff";
+  const isApproved = role === 'admin' || role === 'staff';
 
   return (
     <main className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-center px-4">
@@ -185,14 +177,14 @@ export default function HomePage() {
                   {firebaseUser.displayName || firebaseUser.email}
                 </span>
                 <span className="text-slate-300">
-                  {role === "admin"
-                    ? "관리자"
-                    : role === "staff"
-                      ? "직원"
-                      : role === "pending"
-                        ? "승인 대기"
-                        : "미승인"}
-                  {department ? ` · ${department}` : ""}
+                  {role === 'admin'
+                    ? '관리자'
+                    : role === 'staff'
+                      ? '직원'
+                      : role === 'pending'
+                        ? '승인 대기'
+                        : '미승인'}
+                  {department ? ` · ${department}` : ''}
                 </span>
               </div>
             )}
@@ -214,7 +206,6 @@ export default function HomePage() {
                 <span className="hidden sm:inline">Google 로그인</span>
               </button>
             )}
-
           </div>
         </header>
 
@@ -227,13 +218,11 @@ export default function HomePage() {
                 시스템 접근 권한이 아직 승인되지 않았습니다.
               </div>
               <div className="text-yellow-50/90">
-                관리자에게 승인 요청 후 이용해 주세요. 일부 메뉴는 클릭 시 안내만
-                제공됩니다.
+                관리자에게 승인 요청 후 이용해 주세요. 일부 메뉴는 클릭 시 안내만 제공됩니다.
               </div>
             </div>
           </div>
         )}
-
 
         {/* 카드 그리드 */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -246,9 +235,10 @@ export default function HomePage() {
               border
               text-left
               transition-all
-              ${isApproved
-                ? "border-blue-400/60 bg-slate-900/60 hover:bg-slate-900 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/40"
-                : "border-slate-600/70 bg-slate-900/40 hover:bg-slate-900/70"
+              ${
+                isApproved
+                  ? 'border-blue-400/60 bg-slate-900/60 hover:bg-slate-900 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/40'
+                  : 'border-slate-600/70 bg-slate-900/40 hover:bg-slate-900/70'
               }
             `}
           >
@@ -257,9 +247,7 @@ export default function HomePage() {
                 <Car className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h2 className="text-base md:text-lg font-semibold">
-                  차량 운행 관리
-                </h2>
+                <h2 className="text-base md:text-lg font-semibold">차량 운행 관리</h2>
                 <p className="text-xs sm:text-sm text-slate-300">
                   배차 신청 · 일별 현황 · 운행일지를 한 곳에서 관리
                 </p>
@@ -276,18 +264,17 @@ export default function HomePage() {
               <span
                 className={`
                   inline-flex items-center gap-1 px-2 py-1 rounded-full
-                  ${isApproved
-                    ? "bg-blue-500/20 text-blue-100 border border-blue-400/60"
-                    : "bg-slate-700/60 text-slate-200 border border-slate-500"
+                  ${
+                    isApproved
+                      ? 'bg-blue-500/20 text-blue-100 border border-blue-400/60'
+                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
                   }
                 `}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                {isApproved ? "이용 가능" : "승인 필요"}
+                {isApproved ? '이용 가능' : '승인 필요'}
               </span>
-              <span className="text-slate-300 group-hover:text-white">
-                자세히 보기 →
-              </span>
+              <span className="text-slate-300 group-hover:text-white">자세히 보기 →</span>
             </div>
           </button>
 
@@ -311,9 +298,7 @@ export default function HomePage() {
                 <Clock4 className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h2 className="text-base md:text-lg font-semibold">
-                  연장근로 신청
-                </h2>
+                <h2 className="text-base md:text-lg font-semibold">연장근로 신청</h2>
                 <p className="text-xs sm:text-sm text-slate-300">
                   연장 · 휴일근로 신청 및 결재(준비 중)
                 </p>
@@ -331,9 +316,7 @@ export default function HomePage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
                 추후 개발 예정
               </span>
-              <span className="text-slate-300 group-hover:text-white">
-                알림 보기 →
-              </span>
+              <span className="text-slate-300 group-hover:text-white">알림 보기 →</span>
             </div>
           </button>
 
@@ -344,9 +327,10 @@ export default function HomePage() {
               rounded-2xl px-5 py-6 md:px-6 md:py-7
               border
               text-left
-              ${role === "admin"
-                ? "border-emerald-400/60 bg-slate-900/60"
-                : "border-slate-700 bg-slate-900/30 opacity-70"
+              ${
+                role === 'admin'
+                  ? 'border-emerald-400/60 bg-slate-900/60'
+                  : 'border-slate-700 bg-slate-900/30 opacity-70'
               }
             `}
           >
@@ -355,12 +339,8 @@ export default function HomePage() {
                 <ShieldCheck className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h2 className="text-base md:text-lg font-semibold">
-                  관리자 패널
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  사용자 권한 및 시스템 정책 관리
-                </p>
+                <h2 className="text-base md:text-lg font-semibold">관리자 패널</h2>
+                <p className="text-xs sm:text-sm text-slate-300">사용자 권한 및 시스템 정책 관리</p>
               </div>
             </div>
 
@@ -369,13 +349,14 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleUserManageClick}
-                disabled={role !== "admin"}
+                disabled={role !== 'admin'}
                 className={`
                   w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm
                   border
-                  ${role === "admin"
-                    ? "border-slate-600 bg-slate-900/80 hover:bg-slate-800/90 transition-colors"
-                    : "border-slate-700 bg-slate-900/40 cursor-not-allowed"
+                  ${
+                    role === 'admin'
+                      ? 'border-slate-600 bg-slate-900/80 hover:bg-slate-800/90 transition-colors'
+                      : 'border-slate-700 bg-slate-900/40 cursor-not-allowed'
                   }
                 `}
               >
@@ -383,22 +364,21 @@ export default function HomePage() {
                   <Users className="w-4 h-4" />
                   사용자 승인 관리
                 </span>
-                <span className="text-[11px] text-slate-300">
-                  추후 개발
-                </span>
+                <span className="text-[11px] text-slate-300">추후 개발</span>
               </button>
 
               {/* 시스템 설정 */}
               <button
                 type="button"
                 onClick={handleSystemConfigClick}
-                disabled={role !== "admin"}
+                disabled={role !== 'admin'}
                 className={`
                   w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm
                   border
-                  ${role === "admin"
-                    ? "border-slate-600 bg-slate-900/80 hover:bg-slate-800/90 transition-colors"
-                    : "border-slate-700 bg-slate-900/40 cursor-not-allowed"
+                  ${
+                    role === 'admin'
+                      ? 'border-slate-600 bg-slate-900/80 hover:bg-slate-800/90 transition-colors'
+                      : 'border-slate-700 bg-slate-900/40 cursor-not-allowed'
                   }
                 `}
               >
@@ -406,15 +386,12 @@ export default function HomePage() {
                   <ShieldCheck className="w-4 h-4" />
                   시스템 정책 설정
                 </span>
-                <span className="text-[11px] text-slate-300">
-                  추후 개발
-                </span>
+                <span className="text-[11px] text-slate-300">추후 개발</span>
               </button>
             </div>
 
             <p className="mt-2 text-[11px] sm:text-xs text-slate-400">
-              관리자 계정에만 활성화됩니다. 직원 계정으로 로그인 시
-              조회만 가능합니다.
+              관리자 계정에만 활성화됩니다. 직원 계정으로 로그인 시 조회만 가능합니다.
             </p>
           </div>
         </section>

@@ -50,7 +50,7 @@ interface BookingFormProps {
     dateStr: string,
     startTime: string,
     endTime: string,
-    excludeId?: string,
+    excludeId?: string
   ) => boolean;
 }
 
@@ -82,8 +82,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     setPickerMonth(selectedDate);
   }, [selectedDate]);
 
-  const excludeId =
-    mode === 'edit' && selectedBooking ? selectedBooking.id : undefined;
+  const excludeId = mode === 'edit' && selectedBooking ? selectedBooking.id : undefined;
 
   const normalizedStartForCheck = normalizeTimeInput(timeInputs.start);
   const normalizedEndForCheck = normalizeTimeInput(timeInputs.end);
@@ -102,7 +101,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       formatDate(selectedDate),
       normalizedStartForCheck,
       normalizedEndForCheck,
-      excludeId,
+      excludeId
     );
 
   const dateStr = formatDate(selectedDate);
@@ -110,13 +109,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   const sameDateBookings = useMemo(
     () =>
       bookings
-        .filter(
-          (b) => b.date === dateStr && b.vehicleId === formData.vehicleId,
-        )
-        .sort((a, b) =>
-          (a.startTime || '').localeCompare(b.startTime || ''),
-        ),
-    [bookings, dateStr, formData.vehicleId],
+        .filter((b) => b.date === dateStr && b.vehicleId === formData.vehicleId)
+        .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || '')),
+    [bookings, dateStr, formData.vehicleId]
   );
 
   const timeStrToMin = (t: string) => {
@@ -176,33 +171,17 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   const effectiveDept = formData.department || defaultDept || '';
 
   const blanks = useMemo(
-    () =>
-      Array(
-        new Date(
-          pickerMonth.getFullYear(),
-          pickerMonth.getMonth(),
-          1,
-        ).getDay(),
-      ).fill(null),
-    [pickerMonth],
+    () => Array(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), 1).getDay()).fill(null),
+    [pickerMonth]
   );
 
   const daysInMonth = useMemo(
-    () =>
-      new Date(
-        pickerMonth.getFullYear(),
-        pickerMonth.getMonth() + 1,
-        0,
-      ).getDate(),
-    [pickerMonth],
+    () => new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() + 1, 0).getDate(),
+    [pickerMonth]
   );
 
   const handleSelectDay = (day: number) => {
-    const nextDate = new Date(
-      pickerMonth.getFullYear(),
-      pickerMonth.getMonth(),
-      day,
-    );
+    const nextDate = new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), day);
     onChangeDate(nextDate);
     setIsDatePickerOpen(false);
   };
@@ -225,9 +204,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           >
             <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
           </button>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
-            차량 배차 신청
-          </h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">차량 배차 신청</h2>
         </div>
       </div>
 
@@ -239,9 +216,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-semibold text-blue-900">
-                배차 기본정보
-              </h3>
+              <h3 className="text-sm sm:text-base font-semibold text-blue-900">배차 기본정보</h3>
               <p className="text-xs sm:text-sm text-blue-800/80">
                 날짜와 신청자, 차량 정보를 확인해 주세요.
               </p>
@@ -249,143 +224,140 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           </div>
 
           {/* 상단: 운행일자 / 신청자·부서 / 선택 차량 */}
-<div className="space-y-3 sm:space-y-4">
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 text-sm sm:text-base">
-    {/* 운행일자 */}
-    <div className="flex flex-col bg-white/80 rounded-xl px-3 py-2.5 border border-blue-100">
-      <div className="flex items-center gap-1">
-        <CalendarIcon className="w-3.5 h-3.5 mr-0.5" />
-        <span className="text-xs sm:text-sm text-gray-500 font-medium">
-          운행일자
-        </span>
-      </div>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 text-sm sm:text-base">
+              {/* 운행일자 */}
+              <div className="flex flex-col bg-white/80 rounded-xl px-3 py-2.5 border border-blue-100">
+                <div className="flex items-center gap-1">
+                  <CalendarIcon className="w-3.5 h-3.5 mr-0.5" />
+                  <span className="text-xs sm:text-sm text-gray-500 font-medium">운행일자</span>
+                </div>
 
-      <div className="mt-1 flex items-center justify-between gap-2">
-        <span className="font-semibold text-gray-900">
-          {selectedDate.getFullYear()}년{' '}
-          {selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일
-        </span>
-        {!isReadOnly && (
-          <button
-            type="button"
-            onClick={() => setIsDatePickerOpen((prev) => !prev)}
-            className="inline-flex items-center justify-center px-2 py-1 rounded-lg border border-blue-200 bg-blue-50 text-[11px] sm:text-xs text-blue-700 font-medium hover:bg-blue-100 hover:border-blue-400 transition-all"
-          >
-            날짜 변경
-          </button>
-        )}
-      </div>
-    </div>
-
-    {/* 신청자 / 부서 요약 */}
-    <div className="flex flex-col bg-white/80 rounded-xl px-3 py-2.5 border border-blue-100">
-      <div className="flex items-center gap-1">
-        <User className="w-3.5 h-3.5 mr-0.5" />
-        <span className="text-xs sm:text-sm text-gray-500 font-medium">
-          신청자 / 부서
-        </span>
-      </div>
-
-      <span className="mt-1 font-semibold text-gray-900">
-        {formData.requester || user.displayName || user.email || '-'}
-        {(effectiveDept || formData.department) && (
-          <span className="ml-1 text-xs sm:text-sm text-gray-500">
-            ({effectiveDept || formData.department})
-          </span>
-        )}
-      </span>
-    </div>
-
-    {/* 선택 차량 요약 */}
-    <div className="flex flex-col bg-white/80 rounded-xl px-3 py-2.5 border border-blue-100">
-    <div className='flex items-center gap-1'> <Car className="w-4 h-4 text-emerald-500" />
-      <span className="text-xs sm:text-sm text-gray-500 font-medium">
-        선택 차량
-      </span></div>
-    
-      <div className="mt-1 flex items-center gap-1.5">
-        <span className="font-semibold text-gray-900">
-          {selectedVehicle
-            ? `${selectedVehicle.name} · ${selectedVehicle.number}`
-            : '차량 미선택'}
-        </span>
-      </div>
-    </div>
-  </div>
-
-  {/* 하단: 이미 예약된 시간(좌) / 신청 가능한 시간대(우) */}
-  {!isReadOnly && (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-      {/* 이미 예약된 시간 */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 sm:p-4 text-[13px] sm:text-[14px] space-y-2 shadow-[0_1px_4px_rgba(37,99,235,0.12)]">
-        <div className="flex items-center gap-1.5 text-blue-800 font-semibold text-[12px] sm:text-[13px]">
-          <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          <span>이미 예약된 시간</span>
-        </div>
-
-        {sameDateBookings.length === 0 ? (
-          <div className="mt-1 text-blue-900 text-[12px] sm:text-[13px]">
-           <span className="ml-1 font-medium">※ 아직 이 차량으로 등록된 예약이 없습니다.</span>
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {sameDateBookings.map((b) => (
-              <span
-                key={b.id}
-                className="px-1.5 py-0.5 rounded-full bg-white text-blue-800 border border-red-400 text-[11px] sm:text-xs"
-              >
-                <span className="font-mono">
-                  {b.startTime} ~ {b.endTime}
-                </span>
-                {(b.requester || b.userName) && (
-                  <span className="ml-1 text-blue-500">
-                    · {b.requester || b.userName}
+                <div className="mt-1 flex items-center justify-between gap-2">
+                  <span className="font-semibold text-gray-900">
+                    {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월{' '}
+                    {selectedDate.getDate()}일
                   </span>
-                )}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => setIsDatePickerOpen((prev) => !prev)}
+                      className="inline-flex items-center justify-center px-2 py-1 rounded-lg border border-blue-200 bg-blue-50 text-[11px] sm:text-xs text-blue-700 font-medium hover:bg-blue-100 hover:border-blue-400 transition-all"
+                    >
+                      날짜 변경
+                    </button>
+                  )}
+                </div>
+              </div>
 
-      {/* 신청 가능한 시간대 */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 sm:p-4 text-[13px] sm:text-[14px] space-y-2 shadow-[0_1px_4px_rgba(37,99,235,0.12)]">
-        <div className="flex items-center gap-1.5 text-blue-800 font-semibold text-[12px] sm:text-[13px]">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span>신청 가능한 시간대 (00:00 ~ 24:00 기준)</span>
-        </div>
+              {/* 신청자 / 부서 요약 */}
+              <div className="flex flex-col bg-white/80 rounded-xl px-3 py-2.5 border border-blue-100">
+                <div className="flex items-center gap-1">
+                  <User className="w-3.5 h-3.5 mr-0.5" />
+                  <span className="text-xs sm:text-sm text-gray-500 font-medium">
+                    신청자 / 부서
+                  </span>
+                </div>
 
-        {availableRanges.length === 0 ? (
-          <div className="mt-1 text-blue-900 text-[12px] sm:text-[13px]">
-            <span>모든 시간대가 이미 예약되어 있습니다.</span>
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {availableRanges.map((r, idx) => (
-              <span
-                key={idx}
-                className="px-1.5 py-0.5 rounded-full bg-blue-600 text-white text-[11px] sm:text-xs font-medium shadow-sm"
-              >
-                <span className="font-mono">
-                  {r.start} ~ {r.end}
+                <span className="mt-1 font-semibold text-gray-900">
+                  {formData.requester || user.displayName || user.email || '-'}
+                  {(effectiveDept || formData.department) && (
+                    <span className="ml-1 text-xs sm:text-sm text-gray-500">
+                      ({effectiveDept || formData.department})
+                    </span>
+                  )}
                 </span>
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )}
-</div>
+              </div>
 
+              {/* 선택 차량 요약 */}
+              <div className="flex flex-col bg-white/80 rounded-xl px-3 py-2.5 border border-blue-100">
+                <div className="flex items-center gap-1">
+                  {' '}
+                  <Car className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs sm:text-sm text-gray-500 font-medium">선택 차량</span>
+                </div>
+
+                <div className="mt-1 flex items-center gap-1.5">
+                  <span className="font-semibold text-gray-900">
+                    {selectedVehicle
+                      ? `${selectedVehicle.name} · ${selectedVehicle.number}`
+                      : '차량 미선택'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 하단: 이미 예약된 시간(좌) / 신청 가능한 시간대(우) */}
+            {!isReadOnly && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                {/* 이미 예약된 시간 */}
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 sm:p-4 text-[13px] sm:text-[14px] space-y-2 shadow-[0_1px_4px_rgba(37,99,235,0.12)]">
+                  <div className="flex items-center gap-1.5 text-blue-800 font-semibold text-[12px] sm:text-[13px]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    <span>이미 예약된 시간</span>
+                  </div>
+
+                  {sameDateBookings.length === 0 ? (
+                    <div className="mt-1 text-blue-900 text-[12px] sm:text-[13px]">
+                      <span className="ml-1 font-medium">
+                        ※ 아직 이 차량으로 등록된 예약이 없습니다.
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {sameDateBookings.map((b) => (
+                        <span
+                          key={b.id}
+                          className="px-1.5 py-0.5 rounded-full bg-white text-blue-800 border border-red-400 text-[11px] sm:text-xs"
+                        >
+                          <span className="font-mono">
+                            {b.startTime} ~ {b.endTime}
+                          </span>
+                          {(b.requester || b.userName) && (
+                            <span className="ml-1 text-blue-500">
+                              · {b.requester || b.userName}
+                            </span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 신청 가능한 시간대 */}
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 sm:p-4 text-[13px] sm:text-[14px] space-y-2 shadow-[0_1px_4px_rgba(37,99,235,0.12)]">
+                  <div className="flex items-center gap-1.5 text-blue-800 font-semibold text-[12px] sm:text-[13px]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>신청 가능한 시간대 (00:00 ~ 24:00 기준)</span>
+                  </div>
+
+                  {availableRanges.length === 0 ? (
+                    <div className="mt-1 text-blue-900 text-[12px] sm:text-[13px]">
+                      <span>모든 시간대가 이미 예약되어 있습니다.</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {availableRanges.map((r, idx) => (
+                        <span
+                          key={idx}
+                          className="px-1.5 py-0.5 rounded-full bg-blue-600 text-white text-[11px] sm:text-xs font-medium shadow-sm"
+                        >
+                          <span className="font-mono">
+                            {r.start} ~ {r.end}
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* 인라인 달력 팝업 (기존 로직 유지) */}
           {!isReadOnly && isDatePickerOpen && (
             <>
-              <div
-                className="fixed inset-0 z-30"
-                onClick={() => setIsDatePickerOpen(false)}
-              />
+              <div className="fixed inset-0 z-30" onClick={() => setIsDatePickerOpen(false)} />
               <div className="absolute top-full mt-2 z-40 w-full max-w-xs sm:max-w-sm">
                 <div className="bg-white border rounded-xl shadow-2xl p-3 sm:p-4 space-y-3">
                   <div className="flex items-center justify-between">
@@ -394,32 +366,21 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                       className="p-2 rounded-lg hover:bg-gray-100"
                       onClick={() =>
                         setPickerMonth(
-                          (prev) =>
-                            new Date(
-                              prev.getFullYear(),
-                              prev.getMonth() - 1,
-                              1,
-                            ),
+                          (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1)
                         )
                       }
                     >
                       <ChevronLeft className="w-4 h-4 text-gray-600" />
                     </button>
                     <div className="text-sm sm:text-base font-semibold text-gray-800">
-                      {pickerMonth.getFullYear()}년{' '}
-                      {pickerMonth.getMonth() + 1}월
+                      {pickerMonth.getFullYear()}년 {pickerMonth.getMonth() + 1}월
                     </div>
                     <button
                       type="button"
                       className="p-2 rounded-lg hover:bg-gray-100"
                       onClick={() =>
                         setPickerMonth(
-                          (prev) =>
-                            new Date(
-                              prev.getFullYear(),
-                              prev.getMonth() + 1,
-                              1,
-                            ),
+                          (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1)
                         )
                       }
                     >
@@ -442,19 +403,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                       <div key={`blank-${idx}`} className="h-9" />
                     ))}
 
-                    {Array.from(
-                      { length: daysInMonth },
-                      (_, i) => i + 1,
-                    ).map((day) => {
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
                       const cellDate = new Date(
                         pickerMonth.getFullYear(),
                         pickerMonth.getMonth(),
-                        day,
+                        day
                       );
 
                       const isSelected =
-                        selectedDate.getFullYear() ===
-                          cellDate.getFullYear() &&
+                        selectedDate.getFullYear() === cellDate.getFullYear() &&
                         selectedDate.getMonth() === cellDate.getMonth() &&
                         selectedDate.getDate() === cellDate.getDate();
 
@@ -476,11 +433,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                             isSelected
                               ? 'bg-blue-600 text-white border-blue-600 shadow-md'
                               : isToday
-                              ? 'border-blue-200 text-blue-700 bg-blue-50'
-                              : 'text-gray-700 bg-white hover:bg-blue-50'
-                          } ${
-                            isSelected ? 'hover:bg-blue-600' : ''
-                          }`}
+                                ? 'border-blue-200 text-blue-700 bg-blue-50'
+                                : 'text-gray-700 bg-white hover:bg-blue-50'
+                          } ${isSelected ? 'hover:bg-blue-600' : ''}`}
                         >
                           {day}
                         </button>
@@ -508,9 +463,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
         {/* 🔻 여기서부터 실제 입력 폼 (DriveLogForm처럼 별 카드로 분리) */}
         <div className="mb-2 sm:mb-3">
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900">
-            배차 신청 정보
-          </h3>
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900">배차 신청 정보</h3>
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             신청자 정보, 차량, 시간, 목적 등을 정확히 입력해 주세요.
           </p>
@@ -574,57 +527,52 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           </div>
 
           {/* 차량 선택 */}
-            <div>
+          <div>
             <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5 sm:mb-2">
-                차량 선택
+              차량 선택
             </label>
 
             <fieldset
-                disabled={isReadOnly}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3"
+              disabled={isReadOnly}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3"
             >
-                {VEHICLES.map((v) => (
+              {VEHICLES.map((v) => (
                 <label
-                    key={v.id}
-                    className={`
+                  key={v.id}
+                  className={`
                     flex items-center p-2.5 sm:p-3 border border-gray-300 rounded-lg
                     transition-all text-xs sm:text-sm w-full
                     ${
-                        formData.vehicleId === v.id
+                      formData.vehicleId === v.id
                         ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500'
                         : 'hover:bg-gray-50'
                     }
                     ${
-                        isReadOnly
-                        ? 'cursor-not-allowed opacity-60 hover:bg-white'
-                        : 'cursor-pointer'
+                      isReadOnly ? 'cursor-not-allowed opacity-60 hover:bg-white' : 'cursor-pointer'
                     }
                     `}
                 >
-                    <input
+                  <input
                     type="radio"
                     name="vehicle"
                     value={v.id}
                     checked={formData.vehicleId === v.id}
                     onChange={(e) =>
-                        onChangeFormData({
+                      onChangeFormData({
                         ...formData,
                         vehicleId: e.target.value,
-                        })
+                      })
                     }
                     className="mr-2 sm:mr-3"
-                    />
-                    <div>
+                  />
+                  <div>
                     <div className="font-bold text-gray-800">{v.number}</div>
-                    <div className="text-[11px] sm:text-xs text-gray-500">
-                        {v.name}
-                    </div>
-                    </div>
+                    <div className="text-[11px] sm:text-xs text-gray-500">{v.name}</div>
+                  </div>
                 </label>
-                ))}
+              ))}
             </fieldset>
-            </div>
-
+          </div>
 
           {/* 출발/도착 시간 입력 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-2.5">
@@ -651,8 +599,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                     });
                   } else if (e.target.value.trim() !== '') {
                     toast.error('출발 시간 형식이 올바르지 않습니다.', {
-                      description:
-                        '예: 09:00, 9-00, 900, 9 00, 9_00 형식으로 입력해 주세요.',
+                      description: '예: 09:00, 9-00, 900, 9 00, 9_00 형식으로 입력해 주세요.',
                     });
                   }
                 }}
@@ -688,8 +635,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                     });
                   } else if (e.target.value.trim() !== '') {
                     toast.error('도착 시간 형식이 올바르지 않습니다.', {
-                      description:
-                        '예: 12:30, 1230, 12-30, 12 30, 12_30 형식으로 입력해 주세요.',
+                      description: '예: 12:30, 1230, 12-30, 12 30, 12_30 형식으로 입력해 주세요.',
                     });
                   }
                 }}
@@ -705,14 +651,11 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
           {!isReadOnly && (
             <div className="text-[11px] sm:text-xs text-gray-500 mt-1">
-              시간 입력 예시:{' '}
-              <span className="font-mono">09:00</span>,{' '}
-              <span className="font-mono">9-00</span>,{' '}
-              <span className="font-mono">900</span>,{' '}
-              <span className="font-mono">9 00</span>,{' '}
-              <span className="font-mono">9_00</span> 형식 모두 입력 가능하며,
-              저장 시 자동으로 <span className="font-mono">HH:MM</span>{' '}
-              형식으로 변환됩니다.
+              시간 입력 예시: <span className="font-mono">09:00</span>,{' '}
+              <span className="font-mono">9-00</span>, <span className="font-mono">900</span>,{' '}
+              <span className="font-mono">9 00</span>, <span className="font-mono">9_00</span> 형식
+              모두 입력 가능하며, 저장 시 자동으로 <span className="font-mono">HH:MM</span> 형식으로
+              변환됩니다.
             </div>
           )}
 
@@ -720,86 +663,78 @@ export const BookingForm: React.FC<BookingFormProps> = ({
             <div className="flex items-start gap-2 bg-red-50 text-red-600 p-2.5 sm:p-3 rounded-lg text-xs sm:text-sm animate-pulse">
               <AlertCircle size={16} className="mt-0.5 shrink-0" />
               <div>
-                <span className="font-bold">예약 불가:</span>{' '}
-                선택하신 시간대에 이미 예약된 일정이 있습니다.
+                <span className="font-bold">예약 불가:</span> 선택하신 시간대에 이미 예약된 일정이
+                있습니다.
               </div>
             </div>
           )}
 
           {/* 예약 현황 안내 카드 (기존 유지) */}
-          {!isReadOnly && (
-            <div className="mt-2 sm:mt-3">
-
-            </div>
-          )}
+          {!isReadOnly && <div className="mt-2 sm:mt-3"></div>}
 
           {/* 출장 지역 / 출장 목적 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* 출장 지역 */}
             <div>
-                <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1">
                 출장 지역
-                </label>
-                <div className="relative">
+              </label>
+              <div className="relative">
                 <MapPin
-                    className="absolute left-2.5 sm:left-3 top-2.5 sm:top-3.5 text-gray-400"
-                    size={16}
+                  className="absolute left-2.5 sm:left-3 top-2.5 sm:top-3.5 text-gray-400"
+                  size={16}
                 />
                 <select
-                    value={formData.destination}
-                    disabled={isReadOnly}
-                    onChange={(e) =>
+                  value={formData.destination}
+                  disabled={isReadOnly}
+                  onChange={(e) =>
                     onChangeFormData({
-                        ...formData,
-                        destination: e.target.value,
+                      ...formData,
+                      destination: e.target.value,
                     })
-                    }
-                    className={`w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${
+                  }
+                  className={`w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${
                     isReadOnly
-                        ? 'bg-gray-100 text-gray-500 cursor-default appearance-none'
-                        : 'bg-white focus:ring-2 focus:ring-blue-500'
-                    }`}
+                      ? 'bg-gray-100 text-gray-500 cursor-default appearance-none'
+                      : 'bg-white focus:ring-2 focus:ring-blue-500'
+                  }`}
                 >
-                    <option value="">출장 지역을 선택하세요</option>
-                    <option value="관내(남양주/구리)">관내(남양주/구리)</option>
-                    <option value="관외">관외</option>
+                  <option value="">출장 지역을 선택하세요</option>
+                  <option value="관내(남양주/구리)">관내(남양주/구리)</option>
+                  <option value="관외">관외</option>
                 </select>
-                </div>
+              </div>
             </div>
 
             {/* 출장 목적 */}
             <div>
-                <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-1">
                 출장 목적
-                </label>
-                <div className="relative">
+              </label>
+              <div className="relative">
                 <FileText
-                    className="absolute left-2.5 sm:left-3 top-2.5 sm:top-3.5 text-gray-400"
-                    size={16}
+                  className="absolute left-2.5 sm:left-3 top-2.5 sm:top-3.5 text-gray-400"
+                  size={16}
                 />
                 <input
-                type="text"
-                placeholder="예: 클라이언트 미팅"
-                value={formData.purpose}
-                disabled={isReadOnly}
-                onChange={(e) =>
-                    onChangeFormData({ ...formData, purpose: e.target.value })
-                }
-                className={`w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${
+                  type="text"
+                  placeholder="예: 클라이언트 미팅"
+                  value={formData.purpose}
+                  disabled={isReadOnly}
+                  onChange={(e) => onChangeFormData({ ...formData, purpose: e.target.value })}
+                  className={`w-full pl-8 sm:pl-10 p-2.5 sm:p-3 border border-gray-300 rounded-lg text-xs sm:text-sm outline-none ${
                     isReadOnly
-                    ? 'bg-gray-50 text-gray-500 cursor-default'
-                    : 'bg-white focus:ring-2 focus:ring-blue-500'
-                }`}
+                      ? 'bg-gray-50 text-gray-500 cursor-default'
+                      : 'bg-white focus:ring-2 focus:ring-blue-500'
+                  }`}
                 />
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
 
           {isReadOnly && (
             <div className="text-xs sm:text-sm text-gray-500 bg-gray-50 border rounded-lg p-2.5 sm:p-3">
-              <span className="text-red-500">
-                다른 사용자가 신청한 배차 내역
-              </span>
+              <span className="text-red-500">다른 사용자가 신청한 배차 내역</span>
               입니다. 내용은 확인만 가능하며 수정할 수 없습니다.
             </div>
           )}
@@ -822,14 +757,13 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                   ? '수정 중...'
                   : '배차 수정하기'
                 : isSubmitting
-                ? '신청 중...'
-                : '배차 신청하기'}
+                  ? '신청 중...'
+                  : '배차 신청하기'}
             </button>
 
             {mode === 'edit' &&
               selectedBooking &&
-              (selectedBooking.userId === user.uid ||
-                user.role === 'admin') && (
+              (selectedBooking.userId === user.uid || user.role === 'admin') && (
                 <button
                   type="button"
                   onClick={onDelete}
