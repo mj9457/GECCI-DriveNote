@@ -80,15 +80,18 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 text-sm sm:text-base">
+        {/* ✅ 3행 2열 (모바일 글씨 한 단계 축소) */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 text-[13px] sm:text-base">
           {/* 운행날짜 */}
           <div className="flex items-start gap-2 bg-white/80 rounded-xl px-3 py-2.5 border border-blue-100">
             <div className="mt-0.5">
               <CalendarIcon className="w-4 h-4 text-blue-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">운행날짜</span>
-              <span className="mt-1 font-semibold text-gray-900">{dateStr}</span>
+              <span className="text-[11px] sm:text-xs text-gray-500 font-medium">운행날짜</span>
+              <span className="mt-1 font-semibold text-gray-900 text-[12px] sm:text-sm">
+                {dateStr}
+              </span>
             </div>
           </div>
 
@@ -98,10 +101,10 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <Car className="w-4 h-4 text-emerald-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">운행차량</span>
-              <span className="mt-1 font-semibold text-gray-900">
+              <span className="text-[11px] sm:text-xs text-gray-500 font-medium">운행차량</span>
+              <span className="mt-1 font-semibold text-gray-900 text-[12px] sm:text-sm">
                 {vehicleLabel}
-                <span className="ml-1 text-xs sm:text-sm text-gray-500">
+                <span className="ml-1 text-[10px] sm:text-xs text-gray-500">
                   ({booking.vehicleId === 'v1' ? '티볼리' : '카니발'})
                 </span>
               </span>
@@ -114,8 +117,8 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <Clock4 className="w-4 h-4 text-orange-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">운행시간</span>
-              <span className="mt-1 font-semibold text-gray-900">
+              <span className="text-[11px] sm:text-xs text-gray-500 font-medium">운행시간</span>
+              <span className="mt-1 font-semibold text-gray-900 text-[12px] sm:text-sm">
                 {booking.startTime} ~ {booking.endTime}
               </span>
             </div>
@@ -127,11 +130,13 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <User className="w-4 h-4 text-purple-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">신청자 / 부서</span>
-              <span className="mt-1 font-semibold text-gray-900">
+              <span className="text-[11px] sm:text-xs text-gray-500 font-medium">
+                신청자 / 부서
+              </span>
+              <span className="mt-1 font-semibold text-gray-900 text-[12px] sm:text-sm">
                 {booking.requester || booking.userName || '-'}
                 {booking.department && (
-                  <span className="ml-1 text-xs sm:text-sm text-gray-500">
+                  <span className="ml-1 text-[10px] sm:text-xs text-gray-500">
                     ({booking.department})
                   </span>
                 )}
@@ -145,8 +150,10 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <MapPin className="w-4 h-4 text-red-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">출장지역</span>
-              <span className="mt-1 font-semibold text-gray-900">{booking.destination || '-'}</span>
+              <span className="text-[11px] sm:text-xs text-gray-500 font-medium">출장지역</span>
+              <span className="mt-1 font-semibold text-gray-900 text-[12px] sm:text-sm">
+                {booking.destination || '-'}
+              </span>
             </div>
           </div>
 
@@ -156,8 +163,10 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               <FileText className="w-4 h-4 text-sky-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs sm:text-sm text-gray-500 font-medium">사용목적</span>
-              <span className="mt-1 font-semibold text-gray-900">{booking.purpose || '-'}</span>
+              <span className="text-[11px] sm:text-xs text-gray-500 font-medium">사용목적</span>
+              <span className="mt-1 font-semibold text-gray-900 text-[12px] sm:text-sm">
+                {booking.purpose || '-'}
+              </span>
             </div>
           </div>
         </div>
@@ -174,9 +183,9 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
 
         <div className="bg-gray-50/70 border border-gray-200 rounded-2xl p-4 sm:p-5 space-y-5 sm:space-y-7">
           {/* 출발지 / 경유지 / 도착지 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-gray-800 mb-1.5">
                 출발지
               </label>
               <input
@@ -187,8 +196,9 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                 className={underlineInput}
               />
             </div>
+
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-red-500 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-red-500 mb-1.5">
                 경유지
               </label>
               <input
@@ -199,8 +209,9 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                 className={underlineInput}
               />
             </div>
-            <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
+
+            <div className="col-span-2 md:col-span-1">
+              <label className="block text-xs sm:text-base font-semibold text-gray-800 mb-1.5">
                 최종 도착지
               </label>
               <input
@@ -214,16 +225,16 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
           </div>
 
           {/* 키로수 영역 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-gray-800 mb-1.5">
                 이전 최종키로수
               </label>
               <input type="text" readOnly value={prevKmDisplay} className={underlineReadOnly} />
             </div>
 
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-red-500 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-red-500 mb-1.5">
                 현재 최종키로수
               </label>
               <div className="flex items-center gap-2">
@@ -238,8 +249,8 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
+            <div className="col-span-2 md:col-span-1">
+              <label className="block text-xs sm:text-base font-semibold text-gray-800 mb-1.5">
                 운행키로수 (자동)
               </label>
               <input
@@ -253,9 +264,9 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
           </div>
 
           {/* 사용 목적 / 운전자 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5">
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-gray-800 mb-1.5">
                 사용 목적
               </label>
               <input
@@ -266,8 +277,9 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
                 className={underlineInput}
               />
             </div>
+
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-gray-800 mb-1.5">
                 운전자 / 동승자
               </label>
               <input
@@ -281,9 +293,9 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
           </div>
 
           {/* 이중주차 / 특이사항 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5">
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-red-500 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-red-500 mb-1.5">
                 이중주차 여부 (민우 전달 필수)
               </label>
               <select
@@ -314,7 +326,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-1.5">
+              <label className="block text-xs sm:text-base font-semibold text-gray-800 mb-1.5">
                 특이사항 (경고등 / 주유 등)
               </label>
               <input
