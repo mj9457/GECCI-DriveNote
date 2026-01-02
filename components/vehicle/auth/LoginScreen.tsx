@@ -1,5 +1,5 @@
 // components/vehicle/LoginScreen.tsx
-import { AlertCircle, Car } from 'lucide-react';
+import { AlertCircle, LogIn } from 'lucide-react';
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -10,7 +10,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, error }) => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
     <div className="bg-white px-6 py-8 sm:px-8 sm:py-10 rounded-2xl shadow-xl w-full max-w-sm sm:max-w-md lg:max-w-lg text-center">
       <div className="bg-blue-100 p-4 rounded-full inline-block mb-4">
-        <Car className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+        <LogIn className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
       </div>
       <div className="flex flex-col items-center">
         <img
@@ -18,11 +18,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, error }) => (
           className="mb-4 sm:mb-5 w-32 sm:w-40 lg:w-44"
           alt="GECCI Logo"
         />
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">차량 운행 관리 시스템</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">내부 관리 시스템</h1>
         <p className="text-gray-500 text-sm sm:text-base mb-6 sm:mb-8 leading-relaxed">
-          사내 차량 배차 및 운행 일지를 관리합니다.
-          <br className="hidden sm:block" />
           승인된 사용자만 접속 가능합니다.
+          <br className="hidden sm:block" />
+          승인 요청은 박민준사원(내선번호 305)에게 문의해주세요.
         </p>
       </div>
 

@@ -50,6 +50,8 @@ export default function VehicleApp() {
 
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
+  const [isLogFormOpen, setIsLogFormOpen] = useState(false);
 
   // defaultDept is provided by auth hook
   const [vehicleFilter, setVehicleFilter] = useState<VehicleFilter>('all');
@@ -94,9 +96,9 @@ export default function VehicleApp() {
     }));
   }, [user]);
 
-  // logView 진입 시 logForm 세팅
+  // log modal 열릴 때 logForm 세팅
   useEffect(() => {
-    if (view !== 'log' || !selectedBooking) return;
+    if (!isLogFormOpen || !selectedBooking) return;
 
     const booking = selectedBooking;
 
@@ -112,7 +114,7 @@ export default function VehicleApp() {
       doubleParking: (existingLog && existingLog.doubleParking) || '',
       note: (existingLog && existingLog.note) || '',
     });
-  }, [view, selectedBooking, driveLogs]);
+  }, [isLogFormOpen, selectedBooking, driveLogs]);
 
   // ----------------- Handlers -----------------
   const { saveBooking, deleteBooking: actionDeleteBooking } = useActions();
@@ -138,7 +140,7 @@ export default function VehicleApp() {
       console.log('로그인 정보에 email 이 없습니다.', user);
     }
 
-    setPrevView(view === 'form' ? 'calendar' : view);
+    setPrevView(view);
 
     setFormMode('create');
     setSelectedBooking(null);
@@ -174,7 +176,7 @@ export default function VehicleApp() {
       }
     }
 
-    setView('form');
+    setIsBookingFormOpen(true);
   };
 
   const changeMonth = (delta: number) => {
@@ -308,6 +310,7 @@ export default function VehicleApp() {
       }
 
       setView('day');
+      setIsBookingFormOpen(false);
       setFormData((prev) => ({
         ...prev,
         destination: '',
@@ -345,6 +348,7 @@ export default function VehicleApp() {
         setSelectedBooking(null);
         setFormMode('create');
         setView('day');
+        setIsBookingFormOpen(false);
       } else {
         throw res.error;
       }
@@ -376,9 +380,7 @@ export default function VehicleApp() {
         if (selectedBooking && selectedBooking.id === booking.id) {
           setSelectedBooking(null);
           setFormMode('create');
-          if (view === 'form') {
-            setView('user');
-          }
+          setIsBookingFormOpen(false);
         }
         toast.success('배차 신청이 삭제되었습니다.');
       } else {
@@ -438,6 +440,11 @@ export default function VehicleApp() {
     const prevKm = prevKmRaw != null ? prevKmRaw : null;
     const finalKm = Number(logForm.finalKm || 0);
 
+    if (!logForm.doubleParking) {
+      toast.error('이중주차 여부를 선택해 주세요.');
+      return;
+    }
+
     if (!finalKm) {
       toast.error('현재 최종 키로수를 입력해 주세요.');
       return;
@@ -495,6 +502,7 @@ export default function VehicleApp() {
         toast.success('운행일지가 저장되었습니다.');
       }
 
+      setIsLogFormOpen(false);
       setView(prevView);
     } catch (error) {
       console.error(error);
@@ -530,14 +538,14 @@ export default function VehicleApp() {
       setFormMode('view');
     }
 
-    setView('form');
+    setIsBookingFormOpen(true);
   };
 
   // 운행일지 화면 열기
   const openDriveLogForm = (booking: Booking, origin: 'list' | 'logs' | 'user' = 'list') => {
     setSelectedBooking(booking);
     setPrevView(origin);
-    setView('log');
+    setIsLogFormOpen(true);
   };
 
   // ----------------- Header / Badge -----------------
@@ -565,7 +573,7 @@ export default function VehicleApp() {
     [pendingLogCount]
   );
 
-  const fabVisible = view !== 'form' && view !== 'log' && view !== 'logs';
+  const fabVisible = !isBookingFormOpen && !isLogFormOpen && view !== 'logs';
 
   // ----------------- Render -----------------
 
@@ -604,12 +612,15 @@ export default function VehicleApp() {
         {user && user.uid && (
           <MainViews
             view={view}
+            bookingFormOpen={isBookingFormOpen}
+            logFormOpen={isLogFormOpen}
             currentDate={currentDate}
             bookings={bookings}
             driveLogs={driveLogs}
             selectedDate={selectedDate}
             selectedBooking={selectedBooking}
             formMode={formMode}
+            formViewPrev={prevView}
             timeInputs={timeInputs}
             formData={formData}
             defaultDept={defaultDept}
@@ -625,12 +636,12 @@ export default function VehicleApp() {
             onOpenDriveLogForm={openDriveLogForm}
             onSubmitBooking={handleBookingSubmit}
             onDeleteBooking={handleDeleteBooking}
-            onBackFromForm={(v) => setView(v)}
+            onCloseBookingForm={() => setIsBookingFormOpen(false)}
             onChangeFormData={setFormData}
             onChangeTimeInputs={setTimeInputs}
             onChangeLogForm={setLogForm}
             onSubmitLog={handleLogSubmit}
-            onBackFromLog={() => setView(prevView)}
+            onCloseLogForm={() => setIsLogFormOpen(false)}
             onDeleteMyBooking={handleDeleteMyBooking}
             onDeleteMyLog={handleDeleteMyLog}
             checkOverlap={(vId, dateStr, startT, endT, excludeId) =>

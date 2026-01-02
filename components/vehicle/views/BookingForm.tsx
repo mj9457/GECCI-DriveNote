@@ -8,6 +8,7 @@ import {
   MapPin,
   User,
   Car,
+  X,
 } from 'lucide-react';
 import { Booking, TimeInputs, View } from '@/types/vehicle';
 import { VEHICLES } from '@/lib/vehicleConstants';
@@ -197,15 +198,16 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     <div className="px-3 sm:px-4 md:px-6 py-4 md:py-6 max-w-5xl mx-auto bg-white min-h-full">
       {/* 상단 타이틀 */}
       <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <button
-            onClick={() => onBack(formViewPrev)}
-            className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full text-gray-600"
-          >
-            <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
-          </button>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">차량 배차 신청</h2>
-        </div>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold">차량 배차 신청</h2>
+        <button
+          type="button"
+          onClick={() => onBack(formViewPrev)}
+          className="p-2 hover:bg-gray-100 rounded-full text-gray-600"
+          aria-label="닫기"
+          title="닫기"
+        >
+          <X className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -268,12 +270,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                   <>
                     {/* 바깥 클릭 닫기: 이건 화면 전체 fixed 유지 */}
                     <div
-                      className="fixed inset-0 z-30"
+                      className="fixed inset-0 z-[60]"
                       onClick={() => setIsDatePickerOpen(false)}
                     />
 
                     {/* 팝업 본체: relative(운행일자) 기준 absolute */}
-                    <div className="absolute top-full left-0 mt-2 z-40 w-[320px] max-w-[90vw]">
+                    <div className="absolute top-full left-0 mt-2 z-[70] w-[320px] max-w-[90vw]">
                       <div className="bg-white border rounded-xl shadow-2xl p-3 sm:p-4 space-y-3">
                         {/* (여기 안 내용은 기존 달력 UI 그대로 복붙) */}
                         <div className="flex items-center justify-between">

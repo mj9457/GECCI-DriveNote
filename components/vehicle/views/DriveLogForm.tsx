@@ -1,12 +1,12 @@
 // components/vehicle/DriveLogForm.tsx
 import {
-  ChevronLeft,
   Calendar as CalendarIcon,
   Car,
   Clock4,
   User,
   MapPin,
   FileText,
+  X,
 } from 'lucide-react';
 import { Booking, LogFormState } from '@/types/vehicle';
 import { VEHICLES } from '@/lib/vehicleConstants';
@@ -55,15 +55,16 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
     <div className="px-3 sm:px-4 md:px-6 py-4 md:py-6 max-w-5xl mx-auto bg-white min-h-full">
       {/* 상단 제목 */}
       <div className="flex items-center justify-between mb-5 sm:mb-7">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            onClick={onBack}
-            className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full text-gray-600"
-          >
-            <ChevronLeft size={22} className="sm:w-6 sm:h-6" />
-          </button>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">운행일지 작성</h2>
-        </div>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">운행일지 작성</h2>
+        <button
+          type="button"
+          onClick={onBack}
+          className="p-2 hover:bg-gray-100 rounded-full text-gray-600"
+          aria-label="닫기"
+          title="닫기"
+        >
+          <X className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
       </div>
 
       {/* 배차 기본정보 카드 */}
@@ -296,7 +297,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
           <div className="grid grid-cols-2 gap-3 sm:gap-5">
             <div>
               <label className="block text-xs sm:text-base font-semibold text-red-500 mb-1.5">
-                이중주차 여부 (민우 전달 필수)
+                이중주차 여부 * (민우 전달 필수)
               </label>
               <select
                 value={logForm.doubleParking}

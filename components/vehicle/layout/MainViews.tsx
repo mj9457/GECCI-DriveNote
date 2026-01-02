@@ -10,12 +10,15 @@ import { UserSummaryView } from '@/components/vehicle/views/UserSummaryView';
 
 interface MainViewsProps {
   view: View;
+  bookingFormOpen: boolean;
+  logFormOpen: boolean;
   currentDate: Date;
   bookings: Booking[];
   driveLogs: DriveLog[];
   selectedDate: Date;
   selectedBooking: Booking | null;
   formMode: 'create' | 'edit' | 'view';
+  formViewPrev: View;
   timeInputs: TimeInputs;
   formData: {
     vehicleId: string;
@@ -39,7 +42,7 @@ interface MainViewsProps {
   onOpenDriveLogForm: (b: Booking, o?: 'list' | 'logs' | 'user') => void;
   onSubmitBooking: () => void;
   onDeleteBooking: () => void;
-  onBackFromForm: (v: View) => void;
+  onCloseBookingForm: () => void;
   onChangeFormData: (d: {
     vehicleId: string;
     startTime: string;
@@ -52,7 +55,7 @@ interface MainViewsProps {
   onChangeTimeInputs: (t: TimeInputs) => void;
   onChangeLogForm: (l: LogFormState) => void;
   onSubmitLog: () => void;
-  onBackFromLog: () => void;
+  onCloseLogForm: () => void;
   onDeleteMyBooking: (b: Booking) => void;
   onDeleteMyLog: (l: DriveLog) => void;
   checkOverlap: (
@@ -69,12 +72,15 @@ interface MainViewsProps {
 
 export const MainViews: React.FC<MainViewsProps> = ({
   view,
+  bookingFormOpen,
+  logFormOpen,
   currentDate,
   bookings,
   driveLogs,
   selectedDate,
   selectedBooking,
   formMode,
+  formViewPrev,
   timeInputs,
   formData,
   defaultDept,
@@ -90,12 +96,12 @@ export const MainViews: React.FC<MainViewsProps> = ({
   onOpenDriveLogForm,
   onSubmitBooking,
   onDeleteBooking,
-  onBackFromForm,
+  onCloseBookingForm,
   onChangeFormData,
   onChangeTimeInputs,
   onChangeLogForm,
   onSubmitLog,
-  onBackFromLog,
+  onCloseLogForm,
   onDeleteMyBooking,
   onDeleteMyLog,
   checkOverlap,
@@ -126,28 +132,6 @@ export const MainViews: React.FC<MainViewsProps> = ({
         />
       )}
 
-      {view === 'form' && (
-        <BookingForm
-          mode={formMode}
-          selectedDate={selectedDate}
-          formViewPrev={'calendar'}
-          formData={formData}
-          defaultDept={defaultDept}
-          timeInputs={timeInputs}
-          bookings={bookings}
-          selectedBooking={selectedBooking}
-          isSubmitting={isSubmitting}
-          onChangeFormData={onChangeFormData}
-          onChangeTimeInputs={onChangeTimeInputs}
-          onSubmit={onSubmitBooking}
-          onDelete={onDeleteBooking}
-          onBack={onBackFromForm}
-          onChangeDate={onChangeSelectedDate}
-          user={user}
-          checkOverlap={checkOverlap}
-        />
-      )}
-
       {view === 'list' && (
         <MonthListView
           currentDate={currentDate}
@@ -159,17 +143,6 @@ export const MainViews: React.FC<MainViewsProps> = ({
           onGoToday={onGoToday}
           onOpenBookingForm={onOpenBookingForm}
           onOpenDriveLogForm={onOpenDriveLogForm}
-        />
-      )}
-
-      {view === 'log' && selectedBooking && (
-        <DriveLogForm
-          booking={selectedBooking}
-          logForm={logForm}
-          prevKm={prevKm}
-          onChangeLogForm={onChangeLogForm}
-          onSubmit={onSubmitLog}
-          onBack={onBackFromLog}
         />
       )}
 
@@ -200,6 +173,63 @@ export const MainViews: React.FC<MainViewsProps> = ({
           onDeleteMyBooking={onDeleteMyBooking}
           onDeleteMyLog={onDeleteMyLog}
         />
+      )}
+
+      {bookingFormOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={onCloseBookingForm} />
+          <div className="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-0 sm:p-4">
+            <div
+              className="w-full sm:max-w-5xl bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="overflow-auto">
+                <BookingForm
+                  mode={formMode}
+                  selectedDate={selectedDate}
+                  formViewPrev={formViewPrev}
+                  formData={formData}
+                  defaultDept={defaultDept}
+                  timeInputs={timeInputs}
+                  bookings={bookings}
+                  selectedBooking={selectedBooking}
+                  isSubmitting={isSubmitting}
+                  onChangeFormData={onChangeFormData}
+                  onChangeTimeInputs={onChangeTimeInputs}
+                  onSubmit={onSubmitBooking}
+                  onDelete={onDeleteBooking}
+                  onBack={() => onCloseBookingForm()}
+                  onChangeDate={onChangeSelectedDate}
+                  user={user}
+                  checkOverlap={checkOverlap}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {logFormOpen && selectedBooking && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={onCloseLogForm} />
+          <div className="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-0 sm:p-4">
+            <div
+              className="w-full sm:max-w-5xl bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="overflow-auto">
+                <DriveLogForm
+                  booking={selectedBooking}
+                  logForm={logForm}
+                  prevKm={prevKm}
+                  onChangeLogForm={onChangeLogForm}
+                  onSubmit={onSubmitLog}
+                  onBack={onCloseLogForm}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );

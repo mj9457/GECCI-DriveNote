@@ -124,7 +124,18 @@ export default function HomePage() {
       alert('로그인 후 이용 가능합니다.');
       return;
     }
-    alert('연장근로신청 기능은 추후 개발 예정입니다.');
+
+    if (role === 'pending') {
+      alert('관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.');
+      return;
+    }
+
+    if (role === 'none') {
+      alert('접근 권한이 없습니다. 관리자에게 문의해 주세요.');
+      return;
+    }
+
+    router.push('/overtime');
   };
 
   /** 관리자용: 사용자 승인 관리 (추후) */
@@ -274,7 +285,7 @@ export default function HomePage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 {isApproved ? '이용 가능' : '승인 필요'}
               </span>
-              <span className="text-slate-300 group-hover:text-white">자세히 보기 →</span>
+              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
             </div>
           </button>
 
@@ -283,12 +294,12 @@ export default function HomePage() {
             onClick={handleOvertimeClick}
             className="
               group relative flex flex-col items-start justify-between
-              rounded-2xl px-5 py-6 md:px-6 md:py-7
-              border border-slate-600/70
-              bg-slate-900/40
+              rounded-2xl px-5 py-6 md:px-6 md:py-7            
+              border border-emerald-400/60
+              bg-slate-900/60
               hover:bg-slate-900/70
               hover:-translate-y-1
-              hover:shadow-2xl hover:shadow-slate-700/40
+              hover:shadow-2xl hover:shadow-green-700/40
               text-left
               transition-all
             "
@@ -307,16 +318,25 @@ export default function HomePage() {
 
             <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
               <li>· 근로일 선택 및 시간대 입력</li>
-              <li>· 부서장 / 사무국장 결재선 지정</li>
+              <li>· 팀장 / 부장 결재선 지정</li>
               <li>· 승인 현황 및 이력 조회</li>
             </ul>
 
             <div className="flex items-center justify-between w-full text-xs sm:text-sm">
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-800 text-slate-200 border border-slate-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                추후 개발 예정
+              <span
+                className={`
+                  inline-flex items-center gap-1 px-2 py-1 rounded-full
+                  ${
+                    isApproved
+                      ? 'bg-emerald-500/20 text-emerald-100 border border-emerald-400/60'
+                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
+                  }
+                `}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                {isApproved ? '이용 가능' : '승인 필요'}
               </span>
-              <span className="text-slate-300 group-hover:text-white">알림 보기 →</span>
+              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
             </div>
           </button>
 
@@ -327,10 +347,7 @@ export default function HomePage() {
               rounded-2xl px-5 py-6 md:px-6 md:py-7
               border
               text-left
-              ${
-                role === 'admin'
-                  ? 'border-emerald-400/60 bg-slate-900/60'
-                  : 'border-slate-700 bg-slate-900/30 opacity-70'
+              border-slate-700 bg-slate-900/30 opacity-50
               }
             `}
           >
