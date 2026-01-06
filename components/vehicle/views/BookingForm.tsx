@@ -270,12 +270,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                   <>
                     {/* 바깥 클릭 닫기: 이건 화면 전체 fixed 유지 */}
                     <div
-                      className="fixed inset-0 z-[60]"
+                      className="fixed inset-0 z-60"
                       onClick={() => setIsDatePickerOpen(false)}
                     />
 
                     {/* 팝업 본체: relative(운행일자) 기준 absolute */}
-                    <div className="absolute top-full left-0 mt-2 z-[70] w-[320px] max-w-[90vw]">
+                    <div className="absolute top-full left-0 mt-2 z-70 w-[320px] max-w-[90vw]">
                       <div className="bg-white border rounded-xl shadow-2xl p-3 sm:p-4 space-y-3">
                         {/* (여기 안 내용은 기존 달력 UI 그대로 복붙) */}
                         <div className="flex items-center justify-between">
@@ -541,9 +541,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               >
                 <option value="">부서를 선택하세요</option>
                 <option value="대외협력추진본부">대외협력추진본부</option>
-                <option value="회원지원팀">회원지원팀</option>
-                <option value="회계팀">회계팀</option>
-                <option value="총무팀">총무팀</option>
+                <option value="회원사업부">회원사업부</option>
                 <option value="사무국">사무국</option>
               </select>
             </div>
