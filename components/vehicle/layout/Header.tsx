@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Car, NotebookText, User as UserIcon, LogOut, House } from 'lucide-react';
+import { Car, NotebookText, User as UserIcon, LogOut, House, IdCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import { View } from '@/types/vehicle';
@@ -126,6 +126,18 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
             홈으로
+          </div>
+        </div>
+        <div className="relative group">
+          <button
+            onClick={() => router.push('/staff')}
+            className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
+            aria-label="직원 정보 확인"
+          >
+            <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+          <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
+            직원 정보 확인
           </div>
         </div>
 
