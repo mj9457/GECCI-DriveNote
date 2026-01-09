@@ -13,7 +13,16 @@ import {
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, appId } from '@/lib/firebaseClient';
 
-import { Car, Clock4, ShieldCheck, Users, LogIn, LogOut, AlertCircle } from 'lucide-react';
+import {
+  Car,
+  Clock4,
+  ShieldCheck,
+  Users,
+  LogIn,
+  LogOut,
+  AlertCircle,
+  CalendarDays,
+} from 'lucide-react';
 
 type UserRole = 'admin' | 'staff' | 'pending' | 'none';
 
@@ -116,6 +125,26 @@ export default function HomePage() {
     }
 
     router.push('/vehicle');
+  };
+
+  /** 휴가 캘린더 진입 */
+  const handleVacationClick = () => {
+    if (!firebaseUser) {
+      alert('로그인 후 이용 가능합니다.');
+      return;
+    }
+
+    if (role === 'pending') {
+      alert('관리자 승인 대기 중입니다. 승인 후 이용 가능합니다.');
+      return;
+    }
+
+    if (role === 'none') {
+      alert('접근 권한이 없습니다. 관리자에게 문의해주세요.');
+      return;
+    }
+
+    router.push('/vacation');
   };
 
   /** 연장근로 신청 (추후 개발 예정) */
@@ -236,7 +265,7 @@ export default function HomePage() {
         )}
 
         {/* 카드 그리드 */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <section className="ㅏ grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* 카드 1: 차량 운행 관리 */}
           <button
             onClick={handleVehicleClick}
@@ -340,8 +369,59 @@ export default function HomePage() {
             </div>
           </button>
 
-          {/* 카드 3: 관리자 전용 메뉴 */}
-          <div
+          {/* 카드 3: 휴가 캘린더 */}
+          <button
+            onClick={handleVacationClick}
+            className="
+              group relative flex flex-col items-start justify-between
+              rounded-2xl px-5 py-6 md:px-6 md:py-7            
+              border border-orange-400/60
+              bg-slate-900/60
+              hover:bg-slate-900/70
+              hover:-translate-y-1
+              hover:shadow-2xl hover:shadow-orange-500/40
+              text-left
+              transition-all
+            "
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-orange-500/90 flex items-center justify-center shadow-lg shadow-orange-500/50">
+                <CalendarDays className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <div>
+                <h2 className="text-base md:text-lg font-semibold">휴가 캘린더</h2>
+                <p className="text-xs sm:text-sm text-slate-300">
+                  차량 · 연장근로와 분리된 팀 휴가 일정 전용 뷰
+                </p>
+              </div>
+            </div>
+
+            <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
+              <li>· 월간 달력에서 팀원 휴가/반차/재택 일정 표시</li>
+              <li>· 내 일정 등록·수정 및 메모 공유</li>
+              <li>· 부서 기준 필수 입력으로 일정 누락 방지</li>
+            </ul>
+
+            <div className="flex items-center justify-between w-full text-xs sm:text-sm">
+              <span
+                className={`
+                  inline-flex items-center gap-1 px-2 py-1 rounded-full
+                  ${
+                    isApproved
+                      ? 'bg-orange-500/20 text-orange-100 border border-orange-400/60'
+                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
+                  }
+                `}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                {isApproved ? '이용 가능' : '승인 필요'}
+              </span>
+              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
+            </div>
+          </button>
+
+          {/* 카드 4: 관리자 전용 메뉴 */}
+          {/* <div
             className={`
               flex flex-col gap-3
               rounded-2xl px-5 py-6 md:px-6 md:py-7
@@ -362,7 +442,6 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-2 mt-2">
-              {/* 사용자 승인 관리 */}
               <button
                 type="button"
                 onClick={handleUserManageClick}
@@ -384,7 +463,6 @@ export default function HomePage() {
                 <span className="text-[11px] text-slate-300">추후 개발</span>
               </button>
 
-              {/* 시스템 설정 */}
               <button
                 type="button"
                 onClick={handleSystemConfigClick}
@@ -410,7 +488,7 @@ export default function HomePage() {
             <p className="mt-2 text-[11px] sm:text-xs text-slate-400">
               관리자 계정에만 활성화됩니다. 직원 계정으로 로그인 시 조회만 가능합니다.
             </p>
-          </div>
+          </div> */}
         </section>
       </div>
     </main>
