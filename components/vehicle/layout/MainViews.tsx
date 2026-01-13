@@ -36,6 +36,7 @@ interface MainViewsProps {
   onChangeMonth: (d: number) => void;
   onSelectDate: (d: Date) => void;
   onChangeSelectedDate: (d: Date) => void;
+  onBackToCalendar: () => void;
   onGoToday: () => void;
   onChangeDay: (d: number) => void;
   onOpenBookingForm: (b: Booking) => void;
@@ -90,6 +91,7 @@ export const MainViews: React.FC<MainViewsProps> = ({
   onChangeMonth,
   onSelectDate,
   onChangeSelectedDate,
+  onBackToCalendar,
   onGoToday,
   onChangeDay,
   onOpenBookingForm,
@@ -126,7 +128,7 @@ export const MainViews: React.FC<MainViewsProps> = ({
         <DayView
           selectedDate={selectedDate}
           bookings={bookings}
-          onBackToCalendar={() => onSelectDate(selectedDate)}
+          onBackToCalendar={onBackToCalendar}
           onChangeDay={onChangeDay}
           onOpenBookingForm={onOpenBookingForm}
         />

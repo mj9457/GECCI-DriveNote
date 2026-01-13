@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -12,6 +12,28 @@ import { staffMembers } from '@/components/staff/data';
 
 const normalize = (value: string) => value.trim().toLowerCase();
 
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const highlightText = (value: string, query: string) => {
+  const trimmed = query.trim();
+  if (!trimmed) return value;
+  const escaped = escapeRegExp(trimmed);
+  const parts = value.split(new RegExp(`(${escaped})`, 'gi'));
+  if (parts.length === 1) return value;
+  return parts.map((part, index) =>
+    part.toLowerCase() === trimmed.toLowerCase() ? (
+      <mark
+        key={`${part}-${index}`}
+        className="rounded bg-amber-300/70 font-semibold text-gray-900"
+      >
+        {part}
+      </mark>
+    ) : (
+      <span key={`${part}-${index}`}>{part}</span>
+    )
+  );
+};
+
 export default function StaffDirectoryApp() {
   const { user, isApproved, loading, loginError, handleLogin, handleLogout } = useVacationAuth();
   const [query, setQuery] = useState('');
@@ -23,18 +45,34 @@ export default function StaffDirectoryApp() {
       [
         member.name,
         member.department,
+        member.division,
         member.title,
         member.position,
         member.extension,
         member.mobile,
         member.email,
-        member.task,
-        member.seat,
+        ...member.tasks,
       ]
         .map(normalize)
         .some((value) => value.includes(q))
     );
   }, [query]);
+
+  const divisionOrder: Array<'회원사업부' | '대외협력추진본부'> = [
+    '회원사업부',
+    '대외협력추진본부',
+  ];
+
+  const membersByDivision = useMemo(() => {
+    const grouped: Record<'회원사업부' | '대외협력추진본부', typeof filteredMembers> = {
+      회원사업부: [],
+      대외협력추진본부: [],
+    };
+    filteredMembers.forEach((member) => {
+      grouped[member.division].push(member);
+    });
+    return grouped;
+  }, [filteredMembers]);
 
   if (loading) {
     return (
@@ -55,7 +93,7 @@ export default function StaffDirectoryApp() {
   return (
     <div className="flex flex-col h-screen bg-slate-100 px-0 sm:px-2 md:px-4 lg:px-8">
       <Toaster position="top-center" richColors closeButton />
-      <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-6xl lg:max-w-[1300px] mx-auto bg-slate-100 md:bg-white md:rounded-2xl md:shadow-2xl overflow-hidden relative my-0 sm:my-4 md:my-6">
+      <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-6xl lg:max-w-[1300px] mx-auto bg-slate-100 md:bg-white md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2">
         <header className="bg-white text-gray-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <div className="bg-indigo-600 text-white p-2 rounded-lg">
@@ -94,19 +132,11 @@ export default function StaffDirectoryApp() {
 
         <main className="flex-1 overflow-auto px-3 sm:px-4 md:px-6 py-4 sm:py-5">
           <section className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="text-sm sm:text-base font-semibold text-gray-900">조직도</h2>
-                <span className="text-[11px] text-gray-500">public/org-chart.png</span>
-              </div>
-              <div className="p-4">
-                <img
-                  src="/org-chart.png"
-                  alt="조직도"
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 object-contain max-h-[360px]"
-                />
-              </div>
-            </div>
+            <img
+              src="/org-chart.jpg"
+              alt="조직도"
+              className="w-full rounded-xl border border-gray-200 object-contain max-h-[360px] pb-0.5 bg-white"
+            />
 
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
               <h2 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">검색</h2>
@@ -120,17 +150,30 @@ export default function StaffDirectoryApp() {
                 />
               </div>
 
-              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-gray-600">
-                {['기획운영팀', '교육사업팀', '차량운행팀', '경영지원팀', '회계팀', '기타'].map(
-                  (label) => (
-                    <div
-                      key={label}
-                      className="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-center"
-                    >
-                      {label}
-                    </div>
-                  )
-                )}
+              <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-gray-600">
+                {[
+                  '전체',
+                  '회원사업부',
+                  '대외협력추진본부',
+                  '회계',
+                  '교육',
+                  '홍보/관리',
+                  '검정',
+                  '무역',
+                ].map((label) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => setQuery(label === '전체' ? '' : label)}
+                    className={`rounded-lg border p-4 text-center cursor-pointer transition ${
+                      (label === '전체' ? query === '' : query === label)
+                        ? 'border-indigo-500 bg-indigo-100 text-indigo-700'
+                        : 'border-gray-200 bg-gray-50 text-gray-600 hover:bg-indigo-50 hover:border-indigo-300'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
           </section>
@@ -140,35 +183,52 @@ export default function StaffDirectoryApp() {
               <h2 className="text-sm sm:text-base font-semibold text-gray-900">
                 직원별 업무분장표
               </h2>
-              <span className="text-xs text-gray-500">
-                총 {filteredMembers.length}명
-              </span>
+              <span className="text-xs text-gray-500">총 {filteredMembers.length}명</span>
             </div>
-            <div className="overflow-auto">
-              <table className="w-full text-xs sm:text-sm">
-                <thead className="bg-gray-50 text-gray-600">
-                  <tr>
-                    <th className="px-3 py-2 text-left">이름</th>
-                    <th className="px-3 py-2 text-left">부서</th>
-                    <th className="px-3 py-2 text-left">직책/직위</th>
-                    <th className="px-3 py-2 text-left">담당업무</th>
-                    <th className="px-3 py-2 text-left">내선</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMembers.map((member) => (
-                    <tr key={member.id} className="border-t border-gray-100">
-                      <td className="px-3 py-2 font-semibold text-gray-900">{member.name}</td>
-                      <td className="px-3 py-2">{member.department}</td>
-                      <td className="px-3 py-2">
-                        {member.title} · {member.position}
-                      </td>
-                      <td className="px-3 py-2 text-gray-700">{member.task}</td>
-                      <td className="px-3 py-2 tabular-nums">{member.extension}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="p-4 space-y-6">
+              {divisionOrder.map((division) => {
+                const members = membersByDivision[division];
+                if (members.length === 0) return null;
+                return (
+                  <div key={division}>
+                    <div className="text-sm sm:text-base font-semibold text-gray-800 mb-3">
+                      {division}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {members.map((member) => (
+                        <div
+                          key={member.id}
+                          className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4 shadow-sm"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <div className="text-base font-bold text-gray-900">
+                                {highlightText(member.name, query)}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {highlightText(member.department, query)} ·{' '}
+                                {highlightText(member.title, query)} ·{' '}
+                                {highlightText(member.position, query)}
+                              </div>
+                            </div>
+                            <span className="text-xs text-gray-500 tabular-nums">
+                              내선 {highlightText(member.extension, query)}
+                            </span>
+                          </div>
+                          <ul className="mt-3 space-y-1 text-xs sm:text-sm text-gray-700">
+                            {member.tasks.map((task) => (
+                              <li key={task} className="flex items-start gap-2">
+                                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                                <span className="flex-1">{highlightText(task, query)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
@@ -177,37 +237,34 @@ export default function StaffDirectoryApp() {
               <h2 className="text-sm sm:text-base font-semibold text-gray-900">직원 개인정보</h2>
               <span className="text-xs text-gray-500">비상 연락처 포함</span>
             </div>
-            <div className="overflow-auto">
-              <table className="w-full text-xs sm:text-sm">
-                <thead className="bg-gray-50 text-gray-600">
-                  <tr>
-                    <th className="px-3 py-2 text-left">이름</th>
-                    <th className="px-3 py-2 text-left">직책/직위</th>
-                    <th className="px-3 py-2 text-left">내선</th>
-                    <th className="px-3 py-2 text-left">휴대폰</th>
-                    <th className="px-3 py-2 text-left">비상연락처</th>
-                    <th className="px-3 py-2 text-left">이메일</th>
-                    <th className="px-3 py-2 text-left">좌석</th>
-                    <th className="px-3 py-2 text-left">입사일</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMembers.map((member) => (
-                    <tr key={member.id} className="border-t border-gray-100">
-                      <td className="px-3 py-2 font-semibold text-gray-900">{member.name}</td>
-                      <td className="px-3 py-2">
-                        {member.title} · {member.position}
-                      </td>
-                      <td className="px-3 py-2 tabular-nums">{member.extension}</td>
-                      <td className="px-3 py-2 tabular-nums">{member.mobile}</td>
-                      <td className="px-3 py-2">{member.emergencyContact}</td>
-                      <td className="px-3 py-2">{member.email}</td>
-                      <td className="px-3 py-2">{member.seat}</td>
-                      <td className="px-3 py-2 tabular-nums">{member.joinedAt}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {filteredMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-base font-bold text-gray-900">
+                        {highlightText(member.name, query)}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {highlightText(member.title, query)} ·{' '}
+                        {highlightText(member.position, query)} ·{' '}
+                        {highlightText(member.department, query)}
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-500 tabular-nums">
+                      내선 {highlightText(member.extension, query)}
+                    </span>
+                  </div>
+                  <div className="mt-3 space-y-1 text-xs sm:text-sm text-gray-700">
+                    <div>휴대폰: {highlightText(member.mobile, query)}</div>
+                    <div>비상연락처: {highlightText(member.emergencyContact, query)}</div>
+                    <div>이메일: {highlightText(member.email, query)}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         </main>

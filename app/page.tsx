@@ -23,7 +23,9 @@ import {
   AlertCircle,
   CalendarDays,
   Building2,
+  IdCard,
 } from 'lucide-react';
+import Link from 'next/link';
 
 type UserRole = 'admin' | 'staff' | 'pending' | 'none';
 
@@ -144,6 +146,12 @@ export default function HomePage() {
     router.push('/rental');
   };
 
+  /** 회장님 수행/행사 일정 캘린더 진입 */
+  const handleChairmanClick = () => {
+    if (!requireApprovedUser()) return;
+    router.push('/chairman');
+  };
+
   /** 연장근로 신청 */
   const handleOvertimeClick = () => {
     if (!requireApprovedUser()) return;
@@ -195,21 +203,30 @@ export default function HomePage() {
           {/* 로그인 영역 */}
           <div className="flex items-center gap-3">
             {isLoggedIn && (
-              <div className="hidden sm:flex flex-col items-end text-right text-xs sm:text-sm">
-                <span className="font-semibold">
-                  {firebaseUser.displayName || firebaseUser.email}
-                </span>
-                <span className="text-slate-300">
-                  {role === 'admin'
-                    ? '관리자'
-                    : role === 'staff'
-                      ? '직원'
-                      : role === 'pending'
-                        ? '승인 대기'
-                        : '미승인'}
-                  {department ? ` · ${department}` : ''}
-                </span>
-              </div>
+              <>
+                <Link
+                  href="/staff"
+                  className="flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors"
+                  aria-label="직원 현황"
+                >
+                  <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
+                </Link>
+                <div className="hidden sm:flex flex-col items-end text-right text-xs sm:text-sm">
+                  <span className="font-semibold">
+                    {firebaseUser.displayName || firebaseUser.email}
+                  </span>
+                  <span className="text-slate-300">
+                    {role === 'admin'
+                      ? '관리자'
+                      : role === 'staff'
+                        ? '직원'
+                        : role === 'pending'
+                          ? '승인 대기'
+                          : '미승인'}
+                    {department ? ` · ${department}` : ''}
+                  </span>
+                </div>
+              </>
             )}
 
             {isLoggedIn ? (
@@ -403,7 +420,58 @@ export default function HomePage() {
             </div>
           </button>
 
-          {/* 카드 4: 교육장 대관 캘린더 */}
+          {/* 카드 4: 회장님 수행/행사 일정 */}
+          <button
+            onClick={handleChairmanClick}
+            className="
+              group relative flex flex-col items-start justify-between
+              rounded-2xl px-5 py-6 md:px-6 md:py-7            
+              border border-indigo-400/60
+              bg-slate-900/60
+              hover:bg-slate-900/70
+              hover:-translate-y-1
+              hover:shadow-2xl hover:shadow-indigo-500/40
+              text-left
+              transition-all
+            "
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-indigo-500/90 flex items-center justify-center shadow-lg shadow-indigo-500/50">
+                <Users className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <div>
+                <h2 className="text-base md:text-lg font-semibold">회장님 수행·행사 일정</h2>
+                <p className="text-xs sm:text-sm text-slate-300">
+                  하나의 캘린더에서 수행/행사 일정을 통합 관리
+                </p>
+              </div>
+            </div>
+
+            <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
+              <li>· 월간 달력에서 수행/행사 일정 함께 표시</li>
+              <li>· 일정 등록·수정 및 장소/메모 관리</li>
+              <li>· 일정 유형별 색상 구분으로 빠른 확인</li>
+            </ul>
+
+            <div className="flex items-center justify-between w-full text-xs sm:text-sm">
+              <span
+                className={`
+                  inline-flex items-center gap-1 px-2 py-1 rounded-full
+                  ${
+                    isApproved
+                      ? 'bg-indigo-500/20 text-indigo-100 border border-indigo-400/60'
+                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
+                  }
+                `}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                {isApproved ? '이용 가능' : '승인 필요'}
+              </span>
+              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
+            </div>
+          </button>
+
+          {/* 카드 5: 교육장 대관 캘린더 */}
           <button
             onClick={handleRentalClick}
             className="
@@ -424,9 +492,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h2 className="text-base md:text-lg font-semibold">교육장 대관 캘린더</h2>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  대관 현황 확인 및 일정 등록
-                </p>
+                <p className="text-xs sm:text-sm text-slate-300">대관 현황 확인 및 일정 등록</p>
               </div>
             </div>
 
@@ -454,7 +520,7 @@ export default function HomePage() {
             </div>
           </button>
 
-          {/* 카드 5: 관리자 전용 메뉴 */}
+          {/* 카드 6: 관리자 전용 메뉴 */}
           {/* <div
             className={`
               flex flex-col gap-3

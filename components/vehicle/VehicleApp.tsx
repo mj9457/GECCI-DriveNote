@@ -630,6 +630,7 @@ export default function VehicleApp() {
             onChangeMonth={changeMonth}
             onSelectDate={handleSelectDateFromCalendar}
             onChangeSelectedDate={handleChangeSelectedDate}
+            onBackToCalendar={() => setView('calendar')}
             onGoToday={goToCurrentMonth}
             onChangeDay={changeDay}
             onOpenBookingForm={openBookingForm}

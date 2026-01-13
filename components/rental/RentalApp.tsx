@@ -108,7 +108,8 @@ export default function RentalApp() {
       !form.facilities.length
     ) {
       toast.error('필수 항목을 모두 입력하세요.', {
-        description: '사업자번호, 업체명, 신청자명, 휴대폰번호, 행사명, 대관일, 시간 정보가 필요합니다.',
+        description:
+          '사업자번호, 업체명, 신청자명, 휴대폰번호, 행사명, 대관일, 시간 정보가 필요합니다.',
       });
       return false;
     }
@@ -192,7 +193,8 @@ export default function RentalApp() {
   const sortedRentals = useMemo(
     () =>
       [...rentals].sort((a, b) => {
-        if (a.rentalDate === b.rentalDate) return (a.eventName || '').localeCompare(b.eventName || '');
+        if (a.rentalDate === b.rentalDate)
+          return (a.eventName || '').localeCompare(b.eventName || '');
         return a.rentalDate.localeCompare(b.rentalDate);
       }),
     [rentals]
@@ -219,7 +221,7 @@ export default function RentalApp() {
   return (
     <div className="flex flex-col h-screen bg-gray-100 px-0 sm:px-2 md:px-4 lg:px-8">
       <Toaster position="top-center" richColors closeButton />
-      <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-7xl mx-auto bg-gray-100 md:bg-gray-50 md:rounded-2xl md:shadow-2xl overflow-hidden relative my-0 sm:my-4 md:my-6">
+      <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-7xl mx-auto bg-gray-100 md:bg-gray-50 md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2">
         <header className="bg-white text-gray-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <div className="bg-cyan-500/90 text-white p-2 rounded-lg">

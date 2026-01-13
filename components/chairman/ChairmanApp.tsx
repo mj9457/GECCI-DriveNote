@@ -1,50 +1,41 @@
-'use client';
+﻿'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Toaster, toast } from 'sonner';
-import { CalendarDays, House, LogOut, Users, IdCard } from 'lucide-react';
+import { CalendarDays, House, IdCard, LogOut, Users } from 'lucide-react';
 
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
 import { useVacationAuth } from '@/components/vacation/hooks/useVacationAuth';
-import { useRealtimeVacations } from '@/components/vacation/hooks/useRealtimeVacations';
-import { useVacationActions } from '@/components/vacation/hooks/useVacationActions';
-import VacationCalendar from '@/components/vacation/views/VacationCalendar';
-import VacationForm from '@/components/vacation/views/VacationForm';
-import { VacationFormState, VacationSchedule } from '@/types/vacation';
+import { useRealtimeChairmanSchedules } from '@/components/chairman/hooks/useRealtimeChairmanSchedules';
+import { useChairmanActions } from '@/components/chairman/hooks/useChairmanActions';
+import ChairmanCalendar from '@/components/chairman/views/ChairmanCalendar';
+import ChairmanForm from '@/components/chairman/views/ChairmanForm';
+import { ChairmanFormState, ChairmanSchedule } from '@/types/chairman';
 
 const toDateValue = (d: Date) => d.toISOString().slice(0, 10);
 
-export default function VacationApp() {
-  const { user, isApproved, loading, loginError, defaultDept, handleLogin, handleLogout } =
-    useVacationAuth();
-  const { vacations } = useRealtimeVacations(user, isApproved);
-  const { saveVacation, deleteVacation } = useVacationActions();
+export default function ChairmanApp() {
+  const { user, isApproved, loading, loginError, handleLogin, handleLogout } = useVacationAuth();
+  const { schedules } = useRealtimeChairmanSchedules(user, isApproved);
+  const { saveSchedule, deleteSchedule } = useChairmanActions();
 
   const [currentMonth, setCurrentMonth] = useState<Date>(() => new Date());
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('create');
-  const [selectedVacation, setSelectedVacation] = useState<VacationSchedule | null>(null);
+  const [selectedSchedule, setSelectedSchedule] = useState<ChairmanSchedule | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form, setForm] = useState<VacationFormState>(() => ({
-    userName: '',
-    department: '',
+  const [form, setForm] = useState<ChairmanFormState>(() => ({
+    scheduleType: 'chairman',
+    title: '',
     startDate: toDateValue(new Date()),
     endDate: toDateValue(new Date()),
-    category: 'annual',
-    subType: 'full',
+    startTime: '09:00',
+    endTime: '18:00',
+    location: '',
     note: '',
   }));
-
-  useEffect(() => {
-    if (!user) return;
-    setForm((prev) => ({
-      ...prev,
-      userName: prev.userName || user.displayName || user.email || '',
-      department: prev.department || user.department || defaultDept || '',
-    }));
-  }, [user, defaultDept]);
 
   const changeMonth = (delta: number) => {
     if (delta === 0) {
@@ -58,61 +49,65 @@ export default function VacationApp() {
 
   const openCreateForm = () => {
     setFormMode('create');
-    setSelectedVacation(null);
+    setSelectedSchedule(null);
     const today = new Date();
     setForm({
-      userName: user?.displayName || user?.email || '',
-      department: user?.department || defaultDept || '',
+      scheduleType: 'chairman',
+      title: '',
       startDate: toDateValue(today),
       endDate: toDateValue(today),
-      category: 'annual',
-      subType: 'full',
+      startTime: '09:00',
+      endTime: '18:00',
+      location: '',
       note: '',
     });
     setIsFormOpen(true);
   };
 
-  const openVacation = (vacation: VacationSchedule) => {
-    setSelectedVacation(vacation);
+  const openSchedule = (schedule: ChairmanSchedule) => {
+    setSelectedSchedule(schedule);
+    const startDate = schedule.startDate || schedule.scheduleDate || toDateValue(new Date());
+    const endDate = schedule.endDate || schedule.startDate || schedule.scheduleDate || startDate;
     setForm({
-      userName: vacation.userName || '',
-      department: vacation.department || '',
-      startDate: vacation.startDate,
-      endDate: vacation.endDate,
-      category: vacation.category,
-      subType: vacation.subType,
-      note: vacation.note || '',
+      scheduleType: schedule.scheduleType,
+      title: schedule.title || '',
+      startDate,
+      endDate,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      location: schedule.location || '',
+      note: schedule.note || '',
     });
 
-    const canEdit = !!user && vacation.userId === user.uid;
+    const canEdit = !!user && schedule.userId === user.uid;
     setFormMode(canEdit ? 'edit' : 'view');
-    const [y, m] = vacation.startDate.split('-').map(Number);
+    const [y, m] = startDate.split('-').map(Number);
     if (y && m) setCurrentMonth(new Date(y, m - 1, 1));
     setIsFormOpen(true);
   };
 
   const validateForm = () => {
     if (
-      !form.userName.trim() ||
-      !form.department.trim() ||
+      !form.title.trim() ||
       !form.startDate ||
       !form.endDate ||
-      !form.subType
+      !form.startTime ||
+      !form.endTime
     ) {
-      toast.error('필수 정보를 모두 입력하세요.', {
-        description: '이름, 부서, 시작일, 종료일, 세부 구분은 필수입니다.',
+      toast.error('필수 항목을 모두 입력하세요.', {
+        description: '일정명, 일정 기간, 시작/종료 시간은 필수입니다.',
       });
       return false;
     }
 
-    const start = new Date(form.startDate);
-    const end = new Date(form.endDate);
+    const start = new Date(`${form.startDate}T${form.startTime}`);
+    const end = new Date(`${form.endDate}T${form.endTime}`);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-      toast.error('날짜 형식이 올바르지 않습니다.');
+      toast.error('날짜/시간 형식이 올바르지 않습니다.');
       return false;
     }
     if (end < start) {
-      toast.error('종료일이 시작일보다 빠를 수 없습니다.');
+      toast.error('종료 날짜/시간이 시작 날짜/시간보다 빠를 수 없습니다.');
       return false;
     }
     return true;
@@ -125,43 +120,39 @@ export default function VacationApp() {
     setIsSubmitting(true);
     try {
       if (formMode === 'create') {
-        const res = await saveVacation('create', {
+        const res = await saveSchedule('create', {
           data: {
             ...form,
             userId: user.uid,
-            userName: form.userName || user.displayName || user.email || '',
-            department: form.department || defaultDept,
             createdAt: new Date().toISOString(),
           },
         });
         if (!res.ok) throw res.error;
-        toast.success('휴가 일정이 등록되었습니다.');
-      } else if (formMode === 'edit' && selectedVacation) {
-        const res = await saveVacation('edit', {
-          id: selectedVacation.id,
+        toast.success('일정이 등록되었습니다.');
+      } else if (formMode === 'edit' && selectedSchedule) {
+        const res = await saveSchedule('edit', {
+          id: selectedSchedule.id,
           data: {
             ...form,
-            userId: selectedVacation.userId,
-            userName: form.userName,
-            department: form.department,
+            userId: selectedSchedule.userId,
             updatedAt: new Date().toISOString(),
           },
         });
         if (!res.ok) throw res.error;
-        toast.success('휴가 일정이 수정되었습니다.');
+        toast.success('일정이 수정되었습니다.');
       }
 
-      const start = new Date(form.startDate);
-      if (!Number.isNaN(start.getTime())) {
-        setCurrentMonth(new Date(start.getFullYear(), start.getMonth(), 1));
+      const day = new Date(form.startDate);
+      if (!Number.isNaN(day.getTime())) {
+        setCurrentMonth(new Date(day.getFullYear(), day.getMonth(), 1));
       }
       setIsFormOpen(false);
-      setSelectedVacation(null);
+      setSelectedSchedule(null);
       setFormMode('create');
     } catch (error) {
       console.error(error);
       toast.error('저장 중 오류가 발생했습니다.', {
-        description: '잠시 후 다시 시도해주세요.',
+        description: '잠시 후 다시 시도해 주세요.',
       });
     } finally {
       setIsSubmitting(false);
@@ -169,15 +160,15 @@ export default function VacationApp() {
   };
 
   const handleDelete = async () => {
-    if (!selectedVacation) return;
-    const ok = window.confirm('정말 이 휴가 일정을 삭제할까요?');
+    if (!selectedSchedule) return;
+    const ok = window.confirm('정말 이 일정을 삭제할까요?');
     if (!ok) return;
     try {
-      const res = await deleteVacation(selectedVacation.id);
+      const res = await deleteSchedule(selectedSchedule.id);
       if (!res.ok) throw res.error;
-      toast.success('휴가 일정이 삭제되었습니다.');
+      toast.success('일정이 삭제되었습니다.');
       setIsFormOpen(false);
-      setSelectedVacation(null);
+      setSelectedSchedule(null);
       setFormMode('create');
     } catch (error) {
       console.error(error);
@@ -185,19 +176,21 @@ export default function VacationApp() {
     }
   };
 
-  const sortedVacations = useMemo(
+  const sortedSchedules = useMemo(
     () =>
-      [...vacations].sort((a, b) => {
-        if (a.startDate === b.startDate) return (a.userName || '').localeCompare(b.userName || '');
-        return a.startDate.localeCompare(b.startDate);
+      [...schedules].sort((a, b) => {
+        const aDate = a.startDate || a.scheduleDate || '';
+        const bDate = b.startDate || b.scheduleDate || '';
+        if (aDate === bDate) return a.startTime.localeCompare(b.startTime);
+        return aDate.localeCompare(bDate);
       }),
-    [vacations]
+    [schedules]
   );
 
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-indigo-600 border-t-transparent" />
       </div>
     );
   }
@@ -210,7 +203,7 @@ export default function VacationApp() {
     return <UnauthorizedScreen email={user.email || user.uid} onLogout={handleLogout} />;
   }
 
-  const canDelete = !!user && selectedVacation?.userId === user.uid;
+  const canDelete = !!user && selectedSchedule?.userId === user.uid;
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 px-0 sm:px-2 md:px-4 lg:px-8">
@@ -218,25 +211,27 @@ export default function VacationApp() {
       <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-7xl mx-auto bg-gray-100 md:bg-gray-50 md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2">
         <header className="bg-white text-gray-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <div className="bg-blue-600 text-white p-2 rounded-lg">
+            <div className="bg-indigo-600 text-white p-2 rounded-lg">
               <CalendarDays className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="font-bold text-base sm:text-lg md:text-xl">부서원 휴가 달력</h1>
-              <p className="text-xs text-gray-500 hidden sm:block">휴가 일정 캘린더</p>
+              <h1 className="font-bold text-base sm:text-lg md:text-xl">회장님 수행·행사 일정</h1>
+              <p className="text-xs text-gray-500 hidden sm:block">
+                달력에서 수행/행사 일정을 관리합니다.
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors"
+              className="flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors"
             >
               <House className="w-5 h-5 sm:w-6 sm:h-6" />
             </Link>
             <Link
               href="/staff"
-              className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors"
+              className="flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors"
               aria-label="직원 현황"
             >
               <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -246,7 +241,6 @@ export default function VacationApp() {
               <span className="font-medium truncate max-w-[180px]">
                 {user.displayName || user.email}
               </span>
-              {user.department ? <span className="text-gray-500">· {user.department}</span> : null}
             </div>
             <button
               onClick={handleLogout}
@@ -259,17 +253,17 @@ export default function VacationApp() {
         </header>
 
         <main className="flex-1 overflow-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4">
-          <VacationCalendar
+          <ChairmanCalendar
             currentMonth={currentMonth}
-            vacations={sortedVacations}
+            schedules={sortedSchedules}
             onChangeMonth={changeMonth}
-            onSelectEvent={openVacation}
+            onSelectEvent={openSchedule}
             onAdd={openCreateForm}
           />
         </main>
       </div>
 
-      <VacationForm
+      <ChairmanForm
         open={isFormOpen}
         mode={formMode}
         form={form}
