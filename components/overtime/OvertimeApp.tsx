@@ -20,6 +20,7 @@ import { normalizeTimeInput } from '@/lib/timeUtils';
 import { diffMinutes, formatMinutes, toDateInputValue, toMonthKey } from '@/lib/overtimeUtils';
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
+import HeaderMenu from '@/components/shared/HeaderMenu';
 import { useOvertimeAuth } from '@/components/overtime/hooks/useOvertimeAuth';
 import { useRealtimeOvertimeApplications } from '@/components/overtime/hooks/useRealtimeOvertimeApplications';
 import { useOvertimeActions } from '@/components/overtime/hooks/useOvertimeActions';
@@ -384,7 +385,7 @@ export default function OvertimeApp() {
         >
           <div className="flex items-center gap-1.5 sm:gap-2 order-1">
             <div className="bg-emerald-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
-              <Clock4 size={18} className="sm:w-5 sm:h-5" />
+              <Clock4 />
             </div>
             <h1 className="font-bold text-base sm:text-lg md:text-xl">연장근로 신청</h1>
             <button className="ml-1 sm:ml-2 inline-flex items-center rounded-full border border-gray-300 bg-white px-2 py-0.5 text-[11px] sm:text-xs text-gray-600 tabular-nums">
@@ -441,30 +442,7 @@ export default function OvertimeApp() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 order-2">
-            <div className="relative group">
-              <Link
-                href="/"
-                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-              >
-                <House className="w-5 h-5 sm:w-6 sm:h-6" />
-              </Link>
-              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-                홈으로
-              </div>
-            </div>
-            <div className="relative group">
-              <button
-                onClick={() => router.push('/staff')}
-                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-                aria-label="직원 정보 확인"
-              >
-                <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-                직원 정보 확인
-              </div>
-            </div>
-
+            <HeaderMenu />
             <div className="relative flex items-center">
               <div
                 className="

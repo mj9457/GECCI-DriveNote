@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, House, LogOut, IdCard, User as UserIcon } from 'lucide-react';
+import { Search, LogOut, IdCard, User as UserIcon } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
+import HeaderMenu from '@/components/shared/HeaderMenu';
 import { useVacationAuth } from '@/components/vacation/hooks/useVacationAuth';
 import { staffMembers } from '@/components/staff/data';
 
@@ -97,8 +98,8 @@ export default function StaffDirectoryApp() {
       <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-6xl lg:max-w-[1300px] mx-auto bg-slate-100 md:bg-white md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2">
         <header className="bg-white text-gray-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
-              <IdCard className="w-5 h-5" />
+            <div className="bg-[#7aab4b] text-white w-11 h-11 rounded-lg flex items-center justify-center">
+              <IdCard />
             </div>
             <div>
               <h1 className="font-bold text-base sm:text-lg md:text-xl">직원 현황</h1>
@@ -109,30 +110,7 @@ export default function StaffDirectoryApp() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 order-2">
-            <div className="relative group">
-              <button
-                onClick={() => router.push('/')}
-                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-              >
-                <House className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-                홈으로
-              </div>
-            </div>
-            <div className="relative group">
-              <button
-                onClick={() => router.push('/staff')}
-                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-                aria-label="직원 정보 확인"
-              >
-                <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-                직원 정보 확인
-              </div>
-            </div>
-
+            <HeaderMenu />
             <div className="relative flex items-center">
               <div
                 className="
@@ -246,7 +224,7 @@ export default function StaffDirectoryApp() {
                               <div className="text-xs text-gray-500 mt-1">
                                 {highlightText(member.department, query)} ·{' '}
                                 {highlightText(member.title, query)} ·{' '}
-                                {highlightText(member.position, query)}
+                                {highlightText(member.position, query)} / {member.email}
                               </div>
                             </div>
                             <span className="text-xs text-gray-500 tabular-nums">
@@ -270,7 +248,7 @@ export default function StaffDirectoryApp() {
             </div>
           </section>
 
-          <section className="mt-5 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          {/* <section className="mt-5 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-sm sm:text-base font-semibold text-gray-900">직원 개인정보</h2>
               <span className="text-xs text-gray-500">비상 연락처 포함</span>
@@ -304,7 +282,7 @@ export default function StaffDirectoryApp() {
                 </div>
               ))}
             </div>
-          </section>
+          </section> */}
         </main>
       </div>
     </div>

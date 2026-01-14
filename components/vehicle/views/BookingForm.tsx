@@ -215,7 +215,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         <div className="bg-blue-50/70 border border-blue-100 rounded-2xl p-4 sm:p-5 mb-4 sm:mb-6 relative">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-md">
-              <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+              <CalendarIcon />
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-semibold text-blue-900">배차 기본정보</h3>

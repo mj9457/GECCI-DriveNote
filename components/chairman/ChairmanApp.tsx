@@ -3,10 +3,11 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
-import { CalendarDays, House, IdCard, LogOut, User as UserIcon } from 'lucide-react';
+import { UserStar, LogOut, User as UserIcon } from 'lucide-react';
 
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
+import HeaderMenu from '@/components/shared/HeaderMenu';
 import { useVacationAuth } from '@/components/vacation/hooks/useVacationAuth';
 import { useRealtimeChairmanSchedules } from '@/components/chairman/hooks/useRealtimeChairmanSchedules';
 import { useChairmanActions } from '@/components/chairman/hooks/useChairmanActions';
@@ -213,7 +214,7 @@ export default function ChairmanApp() {
         <header className="bg-white text-gray-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <div className="bg-indigo-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
-              <CalendarDays className="w-5 h-5" />
+              <UserStar />
             </div>
             <div>
               <h1 className="font-bold text-base sm:text-lg md:text-xl">회장님 수행·행사 일정</h1>
@@ -224,30 +225,7 @@ export default function ChairmanApp() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 order-2">
-            <div className="relative group">
-              <button
-                onClick={() => router.push('/')}
-                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-              >
-                <House className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-                홈으로
-              </div>
-            </div>
-            <div className="relative group">
-              <button
-                onClick={() => router.push('/staff')}
-                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-                aria-label="직원 정보 확인"
-              >
-                <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-                직원 정보 확인
-              </div>
-            </div>
-
+            <HeaderMenu />
             <div className="relative flex items-center">
               <div
                 className="

@@ -2,9 +2,10 @@
 'use client';
 
 import React from 'react';
-import { Car, NotebookText, User as UserIcon, LogOut, House, IdCard } from 'lucide-react';
+import { Car, NotebookText, User as UserIcon, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+import HeaderMenu from '@/components/shared/HeaderMenu';
 import { View } from '@/types/vehicle';
 
 interface HeaderProps {
@@ -54,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
       */}
       <div className="flex items-center gap-1.5 sm:gap-2 order-1">
         <div className="bg-blue-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
-          <Icon size={18} className="sm:w-5 sm:h-5" />
+          <Icon />
         </div>
         <h1 className="font-bold text-base sm:text-lg md:text-xl">{headerTitle}</h1>
 
@@ -115,31 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
         [3] 우측: 홈 아이콘 + 사용자 pill + 로그아웃 
       */}
       <div className="flex items-center gap-2 sm:gap-3 order-2">
-        {/* 🔹 홈 아이콘 */}
-        <div className="relative group">
-          <button
-            onClick={() => router.push('/')}
-            className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-          >
-            <House className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-          <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-            홈으로
-          </div>
-        </div>
-        <div className="relative group">
-          <button
-            onClick={() => router.push('/staff')}
-            className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
-            aria-label="직원 정보 확인"
-          >
-            <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-          <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-            직원 정보 확인
-          </div>
-        </div>
-
+        <HeaderMenu />
         {/* 🔹 사용자 정보 Pill */}
         <div className="relative flex items-center">
           {pendingLogCount > 0 && (

@@ -16,8 +16,7 @@ import { auth, db, appId } from '@/lib/firebaseClient';
 import {
   Car,
   Clock4,
-  ShieldCheck,
-  Users,
+  UserStar,
   LogIn,
   LogOut,
   AlertCircle,
@@ -262,7 +261,7 @@ export default function HomePage() {
         ? 'bg-indigo-500/20 text-indigo-100 border border-indigo-400/60'
         : 'bg-slate-700/60 text-slate-200 border border-slate-500',
       actionLabel: '바로가기 →',
-      Icon: Users,
+      Icon: UserStar,
     },
     {
       key: 'rental',
@@ -305,7 +304,7 @@ export default function HomePage() {
               <>
                 <Link
                   href="/staff"
-                  className="flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors"
+                  className="flex items-center justify-center text-gray-400 hover:text-[#7aab4b] transition-colors"
                   aria-label="직원 현황"
                 >
                   <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />

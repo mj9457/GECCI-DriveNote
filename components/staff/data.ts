@@ -182,7 +182,7 @@ export const staffMembers: StaffMember[] = [
     mobile: '-',
     emergencyContact: '-',
     email: 'leejeanie96@korcham.net',
-    tasks: ['시니어인턴(본부)', '무역증명'],
+    tasks: ['시니어인턴(본부)', '무역증명', '원산지증명(FTA)', '방문인증 & 내용증명'],
   },
   {
     id: 's9',

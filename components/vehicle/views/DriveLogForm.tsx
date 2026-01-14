@@ -1,13 +1,5 @@
 // components/vehicle/DriveLogForm.tsx
-import {
-  Calendar as CalendarIcon,
-  Car,
-  Clock4,
-  User,
-  MapPin,
-  FileText,
-  X,
-} from 'lucide-react';
+import { Calendar as CalendarIcon, Car, Clock4, User, MapPin, FileText, X } from 'lucide-react';
 import { Booking, LogFormState } from '@/types/vehicle';
 import { VEHICLES } from '@/lib/vehicleConstants';
 import { formatDate } from '@/lib/timeUtils';
@@ -71,7 +63,7 @@ export const DriveLogForm: React.FC<DriveLogFormProps> = ({
       <div className="bg-blue-50/70 border border-blue-100 rounded-2xl p-4 sm:p-5 mb-6 shadow-sm">
         <div className="flex items-center gap-2 mb-3 sm:mb-4">
           <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-md">
-            <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+            <FileText />
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-semibold text-blue-900">배차 기본정보</h3>
