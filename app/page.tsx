@@ -186,6 +186,105 @@ export default function HomePage() {
   const isLoggedIn = !!firebaseUser;
   const isApproved = role === 'admin' || role === 'staff';
 
+  const cards = [
+    {
+      key: 'vehicle',
+      title: '차량 운행 관리',
+      description: '배차 신청 · 일별 현황 · 운행일지',
+      features: [
+        '· 달력 기반 차량 배차 현황 조회',
+        '· 배차 신청 / 수정 / 삭제',
+        '· 운행일지 작성 및 월별 통계 확인',
+      ],
+      onClick: handleVehicleClick,
+      cardClassName: isApproved
+        ? 'border-blue-400/60 bg-slate-900/60 hover:bg-slate-900 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/40'
+        : 'border-slate-600/70 bg-slate-900/40 hover:bg-slate-900/70',
+      iconClassName: 'bg-blue-500/90 shadow-blue-500/50',
+      badgeClassName: isApproved
+        ? 'bg-blue-500/20 text-blue-100 border border-blue-400/60'
+        : 'bg-slate-700/60 text-slate-200 border border-slate-500',
+      actionLabel: '바로가기 →',
+      Icon: Car,
+    },
+    {
+      key: 'overtime',
+      title: '연장근로 신청',
+      description: '연장 · 휴일근로 신청 및 결재',
+      features: [
+        '· 근로일 선택 및 시간대 입력',
+        '· 팀장 / 부장 결재선 지정',
+        '· 승인 현황 및 이력 조회',
+      ],
+      onClick: handleOvertimeClick,
+      cardClassName:
+        'border-emerald-400/60 bg-slate-900/60 hover:bg-slate-900/70 hover:-translate-y-1 hover:shadow-2xl hover:shadow-green-700/40',
+      iconClassName: 'bg-emerald-500/90 shadow-emerald-500/40',
+      badgeClassName: isApproved
+        ? 'bg-emerald-500/20 text-emerald-100 border border-emerald-400/60'
+        : 'bg-slate-700/60 text-slate-200 border border-slate-500',
+      actionLabel: '바로가기 →',
+      Icon: Clock4,
+    },
+    {
+      key: 'vacation',
+      title: '휴가 캘린더',
+      description: '직원 휴가 일정',
+      features: [
+        '· 월간 달력에서 팀원 휴가/반차/재택 일정 표시',
+        '· 내 일정 등록·수정 및 메모 공유',
+        '· 부서 기준 필수 입력으로 일정 누락 방지',
+      ],
+      onClick: handleVacationClick,
+      cardClassName:
+        'border-orange-400/60 bg-slate-900/60 hover:bg-slate-900/70 hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-500/40',
+      iconClassName: 'bg-orange-500/90 shadow-orange-500/50',
+      badgeClassName: isApproved
+        ? 'bg-orange-500/20 text-orange-100 border border-orange-400/60'
+        : 'bg-slate-700/60 text-slate-200 border border-slate-500',
+      actionLabel: '바로가기 →',
+      Icon: CalendarDays,
+    },
+    {
+      key: 'chairman',
+      title: '회장님 수행·행사 일정',
+      description: '수행/행사 일정 통합 관리',
+      features: [
+        '· 월간 달력에서 수행/행사 일정 함께 표시',
+        '· 일정 등록·수정 및 장소/메모 관리',
+        '· 일정 유형별 색상 구분으로 빠른 확인',
+      ],
+      onClick: handleChairmanClick,
+      cardClassName:
+        'border-indigo-400/60 bg-slate-900/60 hover:bg-slate-900/70 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/40',
+      iconClassName: 'bg-indigo-500/90 shadow-indigo-500/50',
+      badgeClassName: isApproved
+        ? 'bg-indigo-500/20 text-indigo-100 border border-indigo-400/60'
+        : 'bg-slate-700/60 text-slate-200 border border-slate-500',
+      actionLabel: '바로가기 →',
+      Icon: Users,
+    },
+    {
+      key: 'rental',
+      title: '교육장 대관 캘린더',
+      description: '대관 현황 확인 및 일정 등록',
+      features: [
+        '· 달력 기반 대관 일정 조회',
+        '· 사업자정보/행사/시간 입력',
+        '· 부대시설 및 회원사 구분',
+      ],
+      onClick: handleRentalClick,
+      cardClassName:
+        'border-cyan-400/60 bg-slate-900/60 hover:bg-slate-900/70 hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-500/40',
+      iconClassName: 'bg-cyan-500/90 shadow-cyan-500/50',
+      badgeClassName: isApproved
+        ? 'bg-cyan-500/20 text-cyan-100 border border-cyan-400/60'
+        : 'bg-slate-700/60 text-slate-200 border border-slate-500',
+      actionLabel: '바로가기',
+      Icon: Building2,
+    },
+  ] as const;
+
   return (
     <main className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-center px-4">
       <div className="w-full max-w-5xl">
@@ -266,259 +365,51 @@ export default function HomePage() {
 
         {/* 카드 그리드 */}
         <section className="ㅏ grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* 카드 1: 차량 운행 관리 */}
-          <button
-            onClick={handleVehicleClick}
-            className={`
-              group relative flex flex-col items-start justify-between
-              rounded-2xl px-5 py-6 md:px-6 md:py-7
-              border
-              text-left
-              transition-all
-              ${
-                isApproved
-                  ? 'border-blue-400/60 bg-slate-900/60 hover:bg-slate-900 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/40'
-                  : 'border-slate-600/70 bg-slate-900/40 hover:bg-slate-900/70'
-              }
-            `}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-blue-500/90 flex items-center justify-center shadow-lg shadow-blue-500/50">
-                <Car className="w-5 h-5 md:w-6 md:h-6" />
+          {cards.map((card) => (
+            <button
+              key={card.key}
+              onClick={card.onClick}
+              className={`
+                group relative flex flex-col items-start justify-between
+                rounded-2xl px-5 py-6 md:px-6 md:py-7
+                border
+                text-left
+                transition-all
+                ${card.cardClassName}
+              `}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className={`w-10 h-10 md:w-11 md:h-11 rounded-xl ${card.iconClassName} flex items-center justify-center shadow-lg`}
+                >
+                  <card.Icon className="w-5 h-5 md:w-6 md:h-6" />
+                </div>
+                <div>
+                  <h2 className="text-base md:text-lg font-semibold">{card.title}</h2>
+                  <p className="text-xs sm:text-sm text-slate-300">{card.description}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base md:text-lg font-semibold">차량 운행 관리</h2>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  배차 신청 · 일별 현황 · 운행일지를 한 곳에서 관리
-                </p>
+
+              <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
+                {card.features.map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
+
+              <div className="flex items-center justify-between w-full text-xs sm:text-sm">
+                <span
+                  className={`
+                    inline-flex items-center gap-1 px-2 py-1 rounded-full
+                    ${card.badgeClassName}
+                  `}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  {isApproved ? '이용 가능' : '승인 필요'}
+                </span>
+                <span className="text-slate-300 group-hover:text-white">{card.actionLabel}</span>
               </div>
-            </div>
-
-            <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
-              <li>· 달력 기반 차량 배차 현황 조회</li>
-              <li>· 배차 신청 / 수정 / 삭제</li>
-              <li>· 운행일지 작성 및 월별 통계 확인</li>
-            </ul>
-
-            <div className="flex items-center justify-between w-full text-xs sm:text-sm">
-              <span
-                className={`
-                  inline-flex items-center gap-1 px-2 py-1 rounded-full
-                  ${
-                    isApproved
-                      ? 'bg-blue-500/20 text-blue-100 border border-blue-400/60'
-                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
-                  }
-                `}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                {isApproved ? '이용 가능' : '승인 필요'}
-              </span>
-              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
-            </div>
-          </button>
-
-          {/* 카드 2: 연장근로 신청 */}
-          <button
-            onClick={handleOvertimeClick}
-            className="
-              group relative flex flex-col items-start justify-between
-              rounded-2xl px-5 py-6 md:px-6 md:py-7            
-              border border-emerald-400/60
-              bg-slate-900/60
-              hover:bg-slate-900/70
-              hover:-translate-y-1
-              hover:shadow-2xl hover:shadow-green-700/40
-              text-left
-              transition-all
-            "
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-emerald-500/90 flex items-center justify-center shadow-lg shadow-emerald-500/40">
-                <Clock4 className="w-5 h-5 md:w-6 md:h-6" />
-              </div>
-              <div>
-                <h2 className="text-base md:text-lg font-semibold">연장근로 신청</h2>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  연장 · 휴일근로 신청 및 결재(준비 중)
-                </p>
-              </div>
-            </div>
-
-            <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
-              <li>· 근로일 선택 및 시간대 입력</li>
-              <li>· 팀장 / 부장 결재선 지정</li>
-              <li>· 승인 현황 및 이력 조회</li>
-            </ul>
-
-            <div className="flex items-center justify-between w-full text-xs sm:text-sm">
-              <span
-                className={`
-                  inline-flex items-center gap-1 px-2 py-1 rounded-full
-                  ${
-                    isApproved
-                      ? 'bg-emerald-500/20 text-emerald-100 border border-emerald-400/60'
-                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
-                  }
-                `}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                {isApproved ? '이용 가능' : '승인 필요'}
-              </span>
-              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
-            </div>
-          </button>
-
-          {/* 카드 3: 휴가 캘린더 */}
-          <button
-            onClick={handleVacationClick}
-            className="
-              group relative flex flex-col items-start justify-between
-              rounded-2xl px-5 py-6 md:px-6 md:py-7            
-              border border-orange-400/60
-              bg-slate-900/60
-              hover:bg-slate-900/70
-              hover:-translate-y-1
-              hover:shadow-2xl hover:shadow-orange-500/40
-              text-left
-              transition-all
-            "
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-orange-500/90 flex items-center justify-center shadow-lg shadow-orange-500/50">
-                <CalendarDays className="w-5 h-5 md:w-6 md:h-6" />
-              </div>
-              <div>
-                <h2 className="text-base md:text-lg font-semibold">휴가 캘린더</h2>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  차량 · 연장근로와 분리된 팀 휴가 일정 전용 뷰
-                </p>
-              </div>
-            </div>
-
-            <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
-              <li>· 월간 달력에서 팀원 휴가/반차/재택 일정 표시</li>
-              <li>· 내 일정 등록·수정 및 메모 공유</li>
-              <li>· 부서 기준 필수 입력으로 일정 누락 방지</li>
-            </ul>
-
-            <div className="flex items-center justify-between w-full text-xs sm:text-sm">
-              <span
-                className={`
-                  inline-flex items-center gap-1 px-2 py-1 rounded-full
-                  ${
-                    isApproved
-                      ? 'bg-orange-500/20 text-orange-100 border border-orange-400/60'
-                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
-                  }
-                `}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                {isApproved ? '이용 가능' : '승인 필요'}
-              </span>
-              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
-            </div>
-          </button>
-
-          {/* 카드 4: 회장님 수행/행사 일정 */}
-          <button
-            onClick={handleChairmanClick}
-            className="
-              group relative flex flex-col items-start justify-between
-              rounded-2xl px-5 py-6 md:px-6 md:py-7            
-              border border-indigo-400/60
-              bg-slate-900/60
-              hover:bg-slate-900/70
-              hover:-translate-y-1
-              hover:shadow-2xl hover:shadow-indigo-500/40
-              text-left
-              transition-all
-            "
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-indigo-500/90 flex items-center justify-center shadow-lg shadow-indigo-500/50">
-                <Users className="w-5 h-5 md:w-6 md:h-6" />
-              </div>
-              <div>
-                <h2 className="text-base md:text-lg font-semibold">회장님 수행·행사 일정</h2>
-                <p className="text-xs sm:text-sm text-slate-300">
-                  하나의 캘린더에서 수행/행사 일정을 통합 관리
-                </p>
-              </div>
-            </div>
-
-            <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
-              <li>· 월간 달력에서 수행/행사 일정 함께 표시</li>
-              <li>· 일정 등록·수정 및 장소/메모 관리</li>
-              <li>· 일정 유형별 색상 구분으로 빠른 확인</li>
-            </ul>
-
-            <div className="flex items-center justify-between w-full text-xs sm:text-sm">
-              <span
-                className={`
-                  inline-flex items-center gap-1 px-2 py-1 rounded-full
-                  ${
-                    isApproved
-                      ? 'bg-indigo-500/20 text-indigo-100 border border-indigo-400/60'
-                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
-                  }
-                `}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                {isApproved ? '이용 가능' : '승인 필요'}
-              </span>
-              <span className="text-slate-300 group-hover:text-white">바로가기 →</span>
-            </div>
-          </button>
-
-          {/* 카드 5: 교육장 대관 캘린더 */}
-          <button
-            onClick={handleRentalClick}
-            className="
-              group relative flex flex-col items-start justify-between
-              rounded-2xl px-5 py-6 md:px-6 md:py-7            
-              border border-cyan-400/60
-              bg-slate-900/60
-              hover:bg-slate-900/70
-              hover:-translate-y-1
-              hover:shadow-2xl hover:shadow-cyan-500/40
-              text-left
-              transition-all
-            "
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-cyan-500/90 flex items-center justify-center shadow-lg shadow-cyan-500/50">
-                <Building2 className="w-5 h-5 md:w-6 md:h-6" />
-              </div>
-              <div>
-                <h2 className="text-base md:text-lg font-semibold">교육장 대관 캘린더</h2>
-                <p className="text-xs sm:text-sm text-slate-300">대관 현황 확인 및 일정 등록</p>
-              </div>
-            </div>
-
-            <ul className="text-[11px] sm:text-xs text-slate-300 space-y-1.5 mb-4">
-              <li>· 달력 기반 대관 일정 조회</li>
-              <li>· 사업자정보/행사/시간 입력</li>
-              <li>· 부대시설 및 회원사 구분</li>
-            </ul>
-
-            <div className="flex items-center justify-between w-full text-xs sm:text-sm">
-              <span
-                className={`
-                  inline-flex items-center gap-1 px-2 py-1 rounded-full
-                  ${
-                    isApproved
-                      ? 'bg-cyan-500/20 text-cyan-100 border border-cyan-400/60'
-                      : 'bg-slate-700/60 text-slate-200 border border-slate-500'
-                  }
-                `}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                {isApproved ? '이용 가능' : '승인 필요'}
-              </span>
-              <span className="text-slate-300 group-hover:text-white">바로가기</span>
-            </div>
-          </button>
+            </button>
+          ))}
 
           {/* 카드 6: 관리자 전용 메뉴 */}
           {/* <div

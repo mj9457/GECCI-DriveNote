@@ -45,7 +45,6 @@ export const Header: React.FC<HeaderProps> = ({
         bg-white text-gray-800 
         px-3 sm:px-4 md:px-6 py-3 sm:py-4 
         flex flex-wrap items-center justify-between 
-        /* 721px 이상에서만 줄바꿈 금지(flex-nowrap) */
         min-[721px]:flex-nowrap 
         z-30 shadow-sm relative
       "
@@ -54,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
         [1] 좌측: 아이콘 + 제목 + 차량신청/운행일지 토글 버튼 
       */}
       <div className="flex items-center gap-1.5 sm:gap-2 order-1">
-        <div className="bg-blue-600 p-1.5 sm:p-2 rounded-lg text-white">
+        <div className="bg-blue-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
           <Icon size={18} className="sm:w-5 sm:h-5" />
         </div>
         <h1 className="font-bold text-base sm:text-lg md:text-xl">{headerTitle}</h1>

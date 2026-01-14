@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
 import {
   Check,
@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Clock4,
   House,
+  IdCard,
   LogOut,
   Trash2,
   User as UserIcon,
@@ -23,8 +24,10 @@ import { useOvertimeAuth } from '@/components/overtime/hooks/useOvertimeAuth';
 import { useRealtimeOvertimeApplications } from '@/components/overtime/hooks/useRealtimeOvertimeApplications';
 import { useOvertimeActions } from '@/components/overtime/hooks/useOvertimeActions';
 import FAB from '@/components/vehicle/layout/FAB';
+import Link from 'next/link';
 
 export default function OvertimeApp() {
+  const router = useRouter();
   const { user, isApproved, loading, loginError, canApprove, handleLogin, handleLogout } =
     useOvertimeAuth();
 
@@ -380,7 +383,7 @@ export default function OvertimeApp() {
           "
         >
           <div className="flex items-center gap-1.5 sm:gap-2 order-1">
-            <div className="bg-emerald-600 p-1.5 sm:p-2 rounded-lg text-white">
+            <div className="bg-emerald-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
               <Clock4 size={18} className="sm:w-5 sm:h-5" />
             </div>
             <h1 className="font-bold text-base sm:text-lg md:text-xl">연장근로 신청</h1>
@@ -446,7 +449,19 @@ export default function OvertimeApp() {
                 <House className="w-5 h-5 sm:w-6 sm:h-6" />
               </Link>
               <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
-                홈
+                홈으로
+              </div>
+            </div>
+            <div className="relative group">
+              <button
+                onClick={() => router.push('/staff')}
+                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
+                aria-label="직원 정보 확인"
+              >
+                <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
+                직원 정보 확인
               </div>
             </div>
 
@@ -459,14 +474,14 @@ export default function OvertimeApp() {
                   bg-gray-50
                   px-2 min-[721px]:px-3 py-1.5
                   rounded-full border border-gray-300
-                  min-[721px]:max-w-[220px]
-                  cursor-default
+                  min-[721px]:max-w-[170px]
+                  cursor-pointer hover:bg-blue-50 hover:border-blue-400
                 "
+                onClick={() => router.push('/staff')}
               >
                 <UserIcon className="w-4 h-4 text-gray-500" />
                 <span className="font-medium text-gray-700 truncate hidden min-[721px]:block">
-                  {user.displayName || user.email || user.uid}
-                  {user.department ? ` · ${user.department}` : ''}
+                  {user.displayName || user.email}
                 </span>
               </div>
             </div>

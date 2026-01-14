@@ -1,8 +1,8 @@
 ﻿'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { Search, Users, House, LogOut, IdCard } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, House, LogOut, IdCard, User as UserIcon } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
@@ -35,6 +35,7 @@ const highlightText = (value: string, query: string) => {
 };
 
 export default function StaffDirectoryApp() {
+  const router = useRouter();
   const { user, isApproved, loading, loginError, handleLogin, handleLogout } = useVacationAuth();
   const [query, setQuery] = useState('');
 
@@ -96,7 +97,7 @@ export default function StaffDirectoryApp() {
       <div className="flex flex-col h-full w-full max-w-full sm:max-w-3xl md:max-w-6xl lg:max-w-[1300px] mx-auto bg-slate-100 md:bg-white md:rounded-2xl md:shadow-2xl overflow-hidden relative my-2">
         <header className="bg-white text-gray-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 text-white p-2 rounded-lg">
+            <div className="bg-indigo-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
               <IdCard className="w-5 h-5" />
             </div>
             <div>
@@ -107,26 +108,63 @@ export default function StaffDirectoryApp() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="flex items-center justify-center text-gray-400 hover:text-indigo-500 transition-colors"
-            >
-              <House className="w-5 h-5 sm:w-6 sm:h-6" />
-            </Link>
-            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-700 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-300">
-              <Users className="w-4 h-4 text-gray-500" />
-              <span className="font-medium truncate max-w-[180px]">
-                {user.displayName || user.email}
-              </span>
+          <div className="flex items-center gap-2 sm:gap-3 order-2">
+            <div className="relative group">
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
+              >
+                <House className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
+                홈으로
+              </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
-              aria-label="로그아웃"
-            >
-              <LogOut className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
+            <div className="relative group">
+              <button
+                onClick={() => router.push('/staff')}
+                className="flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
+                aria-label="직원 정보 확인"
+              >
+                <IdCard className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
+                직원 정보 확인
+              </div>
+            </div>
+
+            <div className="relative flex items-center">
+              <div
+                className="
+                  inline-flex items-center 
+                  gap-0 min-[721px]:gap-2       
+                  text-xs sm:text-sm 
+                  bg-gray-50 
+                  px-2 min-[721px]:px-3 py-1.5   
+                  rounded-full border border-gray-300 
+                  min-[721px]:max-w-[170px]      
+                  cursor-pointer hover:bg-blue-50 hover:border-blue-400
+                "
+                onClick={() => router.push('/staff')}
+              >
+                <UserIcon className="w-4 h-4 text-gray-500" />
+                <span className="font-medium text-gray-700 truncate hidden min-[721px]:block">
+                  {user.displayName || user.email}
+                </span>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+              >
+                <LogOut className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+              <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden group-hover:block whitespace-nowrap bg-gray-800 text-white text-[14px] px-2 py-1 rounded-md shadow-lg z-50">
+                로그아웃
+              </div>
+            </div>
           </div>
         </header>
 
