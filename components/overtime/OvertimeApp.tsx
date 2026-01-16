@@ -19,6 +19,7 @@ import { diffMinutes, formatMinutes, toDateInputValue, toMonthKey } from '@/lib/
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
 import HeaderMenu from '@/components/shared/HeaderMenu';
+import NoticeBell from '@/components/notice/NoticeBell';
 import { useOvertimeAuth } from '@/components/overtime/hooks/useOvertimeAuth';
 import { useRealtimeOvertimeApplications } from '@/components/overtime/hooks/useRealtimeOvertimeApplications';
 import { useOvertimeActions } from '@/components/overtime/hooks/useOvertimeActions';
@@ -440,6 +441,11 @@ export default function OvertimeApp() {
 
           <div className="flex items-center gap-2 sm:gap-3 order-2">
             <HeaderMenu />
+            <NoticeBell
+              enabled={!!user && isApproved}
+              userId={user?.uid || user?.email}
+              userEmail={user?.email}
+            />
             <div className="relative flex items-center">
               <div
                 className="

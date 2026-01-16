@@ -3,9 +3,9 @@
 
 import React from 'react';
 import { Car, NotebookText, User as UserIcon, LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 import HeaderMenu from '@/components/shared/HeaderMenu';
+import NoticeBell from '@/components/notice/NoticeBell';
 import { View } from '@/types/vehicle';
 
 interface HeaderProps {
@@ -115,6 +115,11 @@ export const Header: React.FC<HeaderProps> = ({
       */}
       <div className="flex items-center gap-2 sm:gap-3 order-2">
         <HeaderMenu />
+        <NoticeBell
+          enabled={!!user?.uid || !!user?.email}
+          userId={(user?.uid || user?.email) ?? undefined}
+          userEmail={user?.email ?? undefined}
+        />
         {/* 🔹 사용자 정보 Pill */}
         <div className="relative flex items-center">
           {pendingLogCount > 0 && (

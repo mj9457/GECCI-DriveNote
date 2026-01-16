@@ -8,6 +8,7 @@ import { Toaster } from 'sonner';
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
 import HeaderMenu from '@/components/shared/HeaderMenu';
+import NoticeBell from '@/components/notice/NoticeBell';
 import { useVacationAuth } from '@/components/vacation/hooks/useVacationAuth';
 import { staffMembers } from '@/components/staff/data';
 
@@ -111,6 +112,11 @@ export default function StaffDirectoryApp() {
 
           <div className="flex items-center gap-2 sm:gap-3 order-2">
             <HeaderMenu />
+            <NoticeBell
+              enabled={!!user && isApproved}
+              userId={user?.uid || user?.email}
+              userEmail={user?.email}
+            />
             <div className="relative flex items-center">
               <div
                 className="
@@ -216,20 +222,20 @@ export default function StaffDirectoryApp() {
                           key={member.id}
                           className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4 shadow-sm"
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
+                          <div className="flex flex-col items-start justify-between gap-1">
+                            <div className="w-full flex justify-between items-center">
                               <div className="text-base font-bold text-gray-900">
                                 {highlightText(member.name, query)}
                               </div>
-                              <div className="text-xs text-gray-500 mt-1">
-                                {highlightText(member.department, query)} ·{' '}
-                                {highlightText(member.title, query)} ·{' '}
-                                {highlightText(member.position, query)} / {member.email}
-                              </div>
+                              <span className="text-xs text-gray-500 tabular-nums">
+                                내선 {highlightText(member.extension, query)}
+                              </span>
                             </div>
-                            <span className="text-xs text-gray-500 tabular-nums">
-                              내선 {highlightText(member.extension, query)}
-                            </span>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {highlightText(member.department, query)} ·{' '}
+                              {highlightText(member.title, query)} ·{' '}
+                              {highlightText(member.position, query)} / {member.email}
+                            </div>
                           </div>
                           <ul className="mt-3 space-y-1 text-xs sm:text-sm text-gray-700">
                             {member.tasks.map((task) => (

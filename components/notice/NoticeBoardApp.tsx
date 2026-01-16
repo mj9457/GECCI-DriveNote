@@ -11,6 +11,7 @@ import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen
 import { useVacationAuth } from '@/components/vacation/hooks/useVacationAuth';
 import { useRealtimeNoticePosts } from '@/components/notice/hooks/useRealtimeNoticePosts';
 import { useNoticeActions } from '@/components/notice/hooks/useNoticeActions';
+import NoticeBell from '@/components/notice/NoticeBell';
 import FAB from '@/components/vehicle/layout/FAB';
 
 const formatDateTime = (value: string) => {
@@ -32,7 +33,7 @@ export default function NoticeBoardApp() {
   const { user, isApproved, loading, loginError, handleLogin, handleLogout } = useVacationAuth();
 
   const { posts } = useRealtimeNoticePosts(!!user && isApproved);
-  const { createPost, updatePost, deletePost, addLike, removeLike } = useNoticeActions();
+  const { createPost, updatePost, deletePost, addLike } = useNoticeActions();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('create');
@@ -77,9 +78,11 @@ export default function NoticeBoardApp() {
     content: string;
     authorEmail?: string;
     tags?: string[];
+    isConfirmed?: boolean;
   }) => {
     if (!user) return;
-    const canEdit = !!post.authorEmail && !!user.email && post.authorEmail === user.email;
+    const canEdit =
+      !!post.authorEmail && !!user.email && post.authorEmail === user.email && post.isConfirmed;
     setFormMode(canEdit ? 'edit' : 'view');
     setEditingId(post.id);
     setEditingAuthorEmail(post.authorEmail);
@@ -110,6 +113,10 @@ export default function NoticeBoardApp() {
       const canEdit = !!editingAuthorEmail && !!user.email && editingAuthorEmail === user.email;
       if (!canEdit) {
         toast.error('수정 권한이 없습니다.');
+        return;
+      }
+      if (!currentConfirmed) {
+        toast.error('확인 체크 후 수정할 수 있습니다.');
         return;
       }
       if (!editingId) {
@@ -170,18 +177,48 @@ export default function NoticeBoardApp() {
 
   const isReadOnly = formMode === 'view';
   const userEmail = user?.email;
-  const canManageEditing = !!editingAuthorEmail && !!userEmail && editingAuthorEmail === user.email;
+  const canManageEditing = !!editingAuthorEmail && !!userEmail && editingAuthorEmail === userEmail;
   const currentUserId = user?.uid || user?.email || '';
   const currentUserName = user?.displayName || user?.email || '익명';
+  const currentPost = useMemo(
+    () => (editingId ? posts.find((post) => post.id === editingId) : undefined),
+    [editingId, posts]
+  );
+  const currentConfirmed = useMemo(() => {
+    if (!currentPost) return false;
+    const likes = currentPost.likes || [];
+    return (
+      (!!currentUserId && likes.some((like) => like.uid === currentUserId)) ||
+      (!!userEmail && likes.some((like) => like.email === userEmail))
+    );
+  }, [currentPost, currentUserId, userEmail]);
 
   const seenPostIds = useRef<Set<string>>(new Set());
   const hasInitialized = useRef(false);
+  const seenStorageKey = `notice_notified_${currentUserId || 'guest'}`;
 
   useEffect(() => {
     if (!user || !isApproved) return;
 
     if (!hasInitialized.current) {
+      try {
+        const raw = window.localStorage.getItem(seenStorageKey);
+        if (raw) {
+          const stored = JSON.parse(raw) as string[];
+          stored.forEach((id) => seenPostIds.current.add(id));
+        }
+      } catch {
+        /* ignore */
+      }
       posts.forEach((post) => seenPostIds.current.add(post.id));
+      try {
+        window.localStorage.setItem(
+          seenStorageKey,
+          JSON.stringify(Array.from(seenPostIds.current))
+        );
+      } catch {
+        /* ignore */
+      }
       hasInitialized.current = true;
       return;
     }
@@ -191,9 +228,19 @@ export default function NoticeBoardApp() {
       toast(`새로운 공지: ${post.title}`);
       seenPostIds.current.add(post.id);
     });
+    if (newPosts.length > 0) {
+      try {
+        window.localStorage.setItem(
+          seenStorageKey,
+          JSON.stringify(Array.from(seenPostIds.current))
+        );
+      } catch {
+        /* ignore */
+      }
+    }
   }, [posts, user, isApproved]);
 
-  const onToggleLike = async (post: {
+  const onConfirmPost = async (post: {
     id: string;
     likes?: { uid: string; name: string; email?: string }[];
   }) => {
@@ -205,15 +252,12 @@ export default function NoticeBoardApp() {
       post.likes?.find((like) => !!userEmail && like.email === userEmail);
 
     try {
-      if (existing) {
-        await removeLike(post.id, existing);
-      } else {
-        await addLike(post.id, {
-          uid: currentUserId,
-          name: currentUserName,
-          email: userEmail,
-        });
-      }
+      if (existing) return;
+      await addLike(post.id, {
+        uid: currentUserId,
+        name: currentUserName,
+        email: userEmail,
+      });
     } catch (error) {
       console.error(error);
       toast.error('확인 처리에 실패했습니다.');
@@ -223,7 +267,7 @@ export default function NoticeBoardApp() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-rose-600 border-t-transparent" />
       </div>
     );
   }
@@ -251,7 +295,7 @@ export default function NoticeBoardApp() {
           "
         >
           <div className="flex items-center gap-2 order-1">
-            <div className="bg-blue-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
+            <div className="bg-rose-600 text-white w-11 h-11 rounded-lg flex items-center justify-center">
               <Bell />
             </div>
             <h1 className="font-bold text-base sm:text-lg md:text-xl">공지 게시판</h1>
@@ -259,6 +303,11 @@ export default function NoticeBoardApp() {
 
           <div className="flex items-center gap-2 sm:gap-3 order-2">
             <HeaderMenu />
+            <NoticeBell
+              enabled={!!user && isApproved}
+              userId={currentUserId}
+              userEmail={userEmail}
+            />
             <div className="relative flex items-center">
               <div
                 className="
@@ -269,7 +318,7 @@ export default function NoticeBoardApp() {
                   px-2 min-[721px]:px-3 py-1.5
                   rounded-full border border-gray-300
                   min-[721px]:max-w-[170px]
-                  cursor-pointer hover:bg-blue-50 hover:border-blue-400
+                  cursor-pointer hover:bg-rose-50 hover:border-rose-400
                 "
                 onClick={() => router.push('/staff')}
               >
@@ -300,7 +349,7 @@ export default function NoticeBoardApp() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="제목, 내용, 작성자, 태그로 검색"
-              className="w-full h-11 rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full h-11 rounded-full border border-gray-300 bg-white px-4 text-sm focus:ring-2 focus:ring-rose-500 outline-none"
             />
           </div>
           {filteredPosts.length === 0 ? (
@@ -319,7 +368,7 @@ export default function NoticeBoardApp() {
 
                 const likes = post.likes || [];
                 const likeCount = likes.length;
-                const hasLiked =
+                const hasConfirmed =
                   likes.some((like) => like.uid === currentUserId) ||
                   likes.some((like) => !!user.email && like.email === user.email);
 
@@ -330,6 +379,7 @@ export default function NoticeBoardApp() {
                     content: post.content,
                     authorEmail: post.authorEmail,
                     tags: post.tags,
+                    isConfirmed: hasConfirmed,
                   });
 
                 return (
@@ -355,13 +405,13 @@ export default function NoticeBoardApp() {
                       </div>
                       {canManage && (
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[11px] text-blue-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-1 text-[11px] text-rose-700">
                             <Pencil className="w-3 h-3" />내 글
                           </span>
                         </div>
                       )}
                     </div>
-                    <p className="mt-3 text-sm text-gray-700 whitespace-pre-line wrap-break-words">
+                    <p className="mt-3 text-sm text-gray-700 whitespace-pre-line break-words">
                       {post.content}
                     </p>
                     {post.tags && post.tags.length > 0 && (
@@ -381,14 +431,16 @@ export default function NoticeBoardApp() {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onToggleLike(post);
+                          if (hasConfirmed) return;
+                          onConfirmPost(post);
                         }}
+                        disabled={hasConfirmed}
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition ${
-                          hasLiked
-                            ? 'border-blue-200 bg-blue-50 text-blue-700'
-                            : 'border-gray-200 bg-white text-gray-500 hover:border-blue-200 hover:text-blue-600'
+                          hasConfirmed
+                            ? 'border-rose-200 bg-rose-50 text-rose-700'
+                            : 'border-gray-200 bg-white text-gray-500 hover:border-rose-200 hover:text-rose-600'
                         }`}
-                        aria-pressed={hasLiked}
+                        aria-pressed={hasConfirmed}
                       >
                         <Check className="w-3.5 h-3.5" />
                         확인 {likeCount}
@@ -399,7 +451,7 @@ export default function NoticeBoardApp() {
                           e.stopPropagation();
                           setOpenLikesId((prev) => (prev === post.id ? null : post.id));
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] text-gray-500 hover:border-blue-200 hover:text-blue-600"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] text-gray-500 hover:border-rose-200 hover:text-rose-600"
                         aria-label="확인한 사람 보기"
                       >
                         <Users className="w-3.5 h-3.5" />
@@ -407,7 +459,7 @@ export default function NoticeBoardApp() {
                       </button>
                     </div>
                     {openLikesId === post.id && (
-                      <div className="absolute right-4 top-full mt-2 w-44 rounded-lg border border-gray-200 bg-white p-2 shadow-lg z-20">
+                      <div className="absolute right-4 mt-2 w-44 rounded-lg border border-gray-200 bg-white p-2 shadow-lg z-20">
                         <div className="text-[11px] text-gray-500 mb-1">확인한 사람</div>
                         {likes.length === 0 ? (
                           <div className="text-xs text-gray-400">아직 없습니다.</div>
@@ -415,7 +467,7 @@ export default function NoticeBoardApp() {
                           <ul className="max-h-32 overflow-auto text-xs text-gray-700">
                             {likes.map((like) => (
                               <li key={`${post.id}-${like.uid}`} className="py-0.5">
-                                🟥 {like.name}
+                                {like.name}
                               </li>
                             ))}
                           </ul>
@@ -444,7 +496,7 @@ export default function NoticeBoardApp() {
             <div className="w-full sm:max-w-3xl bg-white rounded-xl shadow-xl overflow-hidden max-h-[92vh] flex flex-col">
               <div className="px-4 sm:px-6 py-4 border-b flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="bg-blue-600 p-2 rounded-lg text-white">
+                  <div className="bg-rose-600 p-2 rounded-lg text-white">
                     <Bell className="w-5 h-5" />
                   </div>
                   <div>
@@ -473,7 +525,7 @@ export default function NoticeBoardApp() {
               </div>
 
               <div className="px-4 sm:px-6 py-4 sm:py-6 overflow-auto">
-                <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4 sm:p-5">
+                <div className="bg-rose-50/60 border border-rose-100 rounded-2xl p-4 sm:p-5">
                   <div className="grid grid-cols-1 gap-3 sm:gap-4">
                     <label className="flex flex-col gap-1">
                       <span className="text-xs sm:text-sm font-bold text-gray-700">제목 *</span>
@@ -481,7 +533,7 @@ export default function NoticeBoardApp() {
                         value={form.title}
                         disabled={isReadOnly}
                         onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                        className="h-11 rounded-lg border border-gray-300 px-3 text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="h-11 rounded-lg border border-gray-300 px-3 text-sm bg-white focus:ring-2 focus:ring-rose-500 outline-none"
                         placeholder="공지 제목을 입력하세요."
                       />
                     </label>
@@ -492,7 +544,7 @@ export default function NoticeBoardApp() {
                         value={form.content}
                         disabled={isReadOnly}
                         onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))}
-                        className="min-h-90 rounded-xl border border-gray-300 px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="min-h-90 rounded-xl border border-gray-300 px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-rose-500 outline-none"
                         placeholder="공지 내용을 입력하세요."
                       />
                     </label>
@@ -503,7 +555,7 @@ export default function NoticeBoardApp() {
                         value={form.tags}
                         disabled={isReadOnly}
                         onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
-                        className="h-11 rounded-lg border border-gray-300 px-3 text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="h-11 rounded-lg border border-gray-300 px-3 text-sm bg-white focus:ring-2 focus:ring-rose-500 outline-none"
                         placeholder="예: 공지, 전산, 회의"
                       />
                       <span className="text-[11px] text-gray-400">
@@ -515,21 +567,37 @@ export default function NoticeBoardApp() {
                   <div className="mt-5 flex items-center justify-between text-xs sm:text-sm text-gray-500">
                     <span>작성자: {user.displayName || user.email}</span>
                     <div className="flex items-center gap-2">
-                      {formMode === 'view' && !!editingId && canManageEditing && (
+                      {formMode !== 'create' && editingId && !currentConfirmed && (
                         <button
                           type="button"
-                          disabled={!isReadOnly}
-                          onClick={() => setFormMode('edit')}
-                          className={`inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-xs sm:text-sm ${
-                            isReadOnly
-                              ? 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
-                              : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (currentPost) onConfirmPost(currentPost);
+                          }}
+                          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs sm:text-sm text-gray-600 hover:bg-rose-50 hover:border-rose-300"
                         >
-                          <Pencil className="w-3.5 h-3.5" />
-                          수정하기
+                          <Check className="w-3.5 h-3.5" />
+                          확인 체크
                         </button>
                       )}
+                      {formMode === 'view' &&
+                        !!editingId &&
+                        canManageEditing &&
+                        currentConfirmed && (
+                          <button
+                            type="button"
+                            disabled={!isReadOnly}
+                            onClick={() => setFormMode('edit')}
+                            className={`inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-xs sm:text-sm ${
+                              isReadOnly
+                                ? 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
+                                : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                            }`}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                            수정하기
+                          </button>
+                        )}
                       {formMode === 'edit' && editingId && (
                         <button
                           type="button"
@@ -564,7 +632,7 @@ export default function NoticeBoardApp() {
                         type="button"
                         disabled={submitting}
                         onClick={onSubmit}
-                        className="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60"
+                        className="px-4 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 disabled:opacity-60"
                       >
                         {submitting
                           ? '저장 중...'

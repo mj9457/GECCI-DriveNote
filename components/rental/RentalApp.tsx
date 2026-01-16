@@ -8,6 +8,7 @@ import { CalendarDays, LogOut, User as UserIcon } from 'lucide-react';
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
 import HeaderMenu from '@/components/shared/HeaderMenu';
+import NoticeBell from '@/components/notice/NoticeBell';
 import { useVacationAuth } from '@/components/vacation/hooks/useVacationAuth';
 import { useRealtimeRentals } from '@/components/rental/hooks/useRealtimeRentals';
 import { useRentalActions } from '@/components/rental/hooks/useRentalActions';
@@ -239,6 +240,11 @@ export default function RentalApp() {
 
           <div className="flex items-center gap-2 sm:gap-3 order-2">
             <HeaderMenu />
+            <NoticeBell
+              enabled={!!user && isApproved}
+              userId={user?.uid || user?.email}
+              userEmail={user?.email}
+            />
 
             <div className="relative flex items-center">
               <div
