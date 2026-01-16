@@ -16,6 +16,7 @@ import { auth, db, appId } from '@/lib/firebaseClient';
 import {
   Car,
   Clock4,
+  Bell,
   UserStar,
   LogIn,
   LogOut,
@@ -157,6 +158,12 @@ export default function HomePage() {
     router.push('/overtime');
   };
 
+  /** 공지 게시판 */
+  const handleNoticeClick = () => {
+    if (!requireApprovedUser()) return;
+    router.push('/notice');
+  };
+
   /** 관리자용: 사용자 승인 관리 (추후) */
   const handleUserManageClick = () => {
     if (role !== 'admin') return;
@@ -224,6 +231,21 @@ export default function HomePage() {
         : 'bg-slate-700/60 text-slate-200 border border-slate-500',
       actionLabel: '바로가기 →',
       Icon: Clock4,
+    },
+    {
+      key: 'notice',
+      title: '공지 게시판',
+      description: '직원 공지와 공유 게시판',
+      features: ['· 누구나 게시글 작성', '· 작성자만 수정/삭제', '· 제목/내용/작성일 자동 기록'],
+      onClick: handleNoticeClick,
+      cardClassName:
+        'border-red-400/60 bg-slate-900/60 hover:bg-slate-900/70 hover:-translate-y-1 hover:shadow-2xl hover:shadow-red-500/40',
+      iconClassName: 'bg-red-500/90 shadow-red-500/50',
+      badgeClassName: isApproved
+        ? 'bg-red-500/20 text-red-100 border border-red-400/60'
+        : 'bg-slate-700/60 text-slate-200 border border-slate-500',
+      actionLabel: '바로가기 →',
+      Icon: Bell,
     },
     {
       key: 'vacation',

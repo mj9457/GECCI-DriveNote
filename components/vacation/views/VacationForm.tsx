@@ -212,13 +212,6 @@ export function VacationForm({
             )}
 
             <div className="flex items-center gap-2 sm:ml-auto">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:bg-gray-50"
-              >
-                닫기
-              </button>
               {!isReadOnly && (
                 <button
                   type="button"

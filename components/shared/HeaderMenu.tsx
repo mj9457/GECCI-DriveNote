@@ -6,6 +6,7 @@ import { Menu } from 'lucide-react';
 
 const menuItems = [
   { href: '/', label: '홈' },
+  { href: '/notice', label: '공지 게시판' },
   { href: '/vehicle', label: '배차신청' },
   { href: '/overtime', label: '연장근로 신청' },
   { href: '/vacation', label: '직원 휴가' },

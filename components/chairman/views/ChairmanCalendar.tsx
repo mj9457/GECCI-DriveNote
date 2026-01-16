@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { ChairmanSchedule, ChairmanScheduleType } from '@/types/chairman';
@@ -19,6 +19,7 @@ type Props = {
   onChangeMonth: (delta: number) => void;
   onSelectEvent: (schedule: ChairmanSchedule) => void;
   onAdd: () => void;
+  showAddButton?: boolean;
 };
 
 const parseDate = (value?: string) => {
@@ -39,6 +40,7 @@ export function ChairmanCalendar({
   onChangeMonth,
   onSelectEvent,
   onAdd,
+  showAddButton = true,
 }: Props) {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -110,14 +112,16 @@ export function ChairmanCalendar({
           >
             오늘
           </button>
-          <button
-            type="button"
-            onClick={onAdd}
-            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            일정 등록
-          </button>
+          {showAddButton && (
+            <button
+              type="button"
+              onClick={onAdd}
+              className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              일정 등록
+            </button>
+          )}
         </div>
       </header>
 

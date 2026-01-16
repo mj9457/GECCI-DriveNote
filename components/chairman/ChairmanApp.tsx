@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
-import { UserStar, LogOut, User as UserIcon } from 'lucide-react';
+import { UserStar, LogOut, Plus, User as UserIcon } from 'lucide-react';
 
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
 import { UnauthorizedScreen } from '@/components/vehicle/auth/UnauthorizedScreen';
@@ -12,6 +12,7 @@ import { useVacationAuth } from '@/components/vacation/hooks/useVacationAuth';
 import { useRealtimeChairmanSchedules } from '@/components/chairman/hooks/useRealtimeChairmanSchedules';
 import { useChairmanActions } from '@/components/chairman/hooks/useChairmanActions';
 import ChairmanCalendar from '@/components/chairman/views/ChairmanCalendar';
+import ChairmanTable from '@/components/chairman/views/ChairmanTable';
 import ChairmanForm from '@/components/chairman/views/ChairmanForm';
 import { ChairmanFormState, ChairmanSchedule } from '@/types/chairman';
 
@@ -24,6 +25,7 @@ export default function ChairmanApp() {
   const { saveSchedule, deleteSchedule } = useChairmanActions();
 
   const [currentMonth, setCurrentMonth] = useState<Date>(() => new Date());
+  const [viewMode, setViewMode] = useState<'table' | 'calendar'>('table');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedSchedule, setSelectedSchedule] = useState<ChairmanSchedule | null>(null);
@@ -262,13 +264,54 @@ export default function ChairmanApp() {
         </header>
 
         <main className="flex-1 overflow-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4">
-          <ChairmanCalendar
-            currentMonth={currentMonth}
-            schedules={sortedSchedules}
-            onChangeMonth={changeMonth}
-            onSelectEvent={openSchedule}
-            onAdd={openCreateForm}
-          />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+            <div className="flex items-center gap-1 sm:gap-2 bg-gray-100 px-1.5 py-1 rounded-full text-[11px] sm:text-xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`px-2 py-0.5 rounded-full font-medium cursor-pointer transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-white text-indigo-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                테이블
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('calendar')}
+                className={`px-2 py-0.5 rounded-full font-medium cursor-pointer transition-colors ${
+                  viewMode === 'calendar'
+                    ? 'bg-white text-indigo-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                캘린더
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={openCreateForm}
+              className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              일정 등록
+            </button>
+          </div>
+
+          {viewMode === 'table' ? (
+            <ChairmanTable schedules={sortedSchedules} onSelectEvent={openSchedule} />
+          ) : (
+            <ChairmanCalendar
+              currentMonth={currentMonth}
+              schedules={sortedSchedules}
+              onChangeMonth={changeMonth}
+              onSelectEvent={openSchedule}
+              onAdd={openCreateForm}
+              showAddButton={false}
+            />
+          )}
         </main>
       </div>
 
