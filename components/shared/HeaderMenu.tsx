@@ -41,7 +41,7 @@ export default function HeaderMenu() {
           <span>메뉴</span>
         </summary>
 
-        <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 bg-white p-1 shadow-lg z-50">
+        <div className="absolute mt-2 w-48 rounded-xl border border-gray-200 bg-white p-1 shadow-lg z-50">
           {menuItems.map((item) => {
             const active = isActivePath(pathname, item.href);
             return (
