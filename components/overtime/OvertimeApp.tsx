@@ -8,8 +8,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock4,
-  House,
-  IdCard,
   LogOut,
   Trash2,
   User as UserIcon,
@@ -25,7 +23,6 @@ import { useOvertimeAuth } from '@/components/overtime/hooks/useOvertimeAuth';
 import { useRealtimeOvertimeApplications } from '@/components/overtime/hooks/useRealtimeOvertimeApplications';
 import { useOvertimeActions } from '@/components/overtime/hooks/useOvertimeActions';
 import FAB from '@/components/vehicle/layout/FAB';
-import Link from 'next/link';
 
 export default function OvertimeApp() {
   const router = useRouter();

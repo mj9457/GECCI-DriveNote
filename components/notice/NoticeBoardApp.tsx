@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
-import { Bell, LogOut, Pencil, Trash2, User as UserIcon, X } from 'lucide-react';
+import { Bell, LogOut, Pencil, Check, Trash2, User as UserIcon, Users, X } from 'lucide-react';
 
 import HeaderMenu from '@/components/shared/HeaderMenu';
 import { LoginScreen } from '@/components/vehicle/auth/LoginScreen';
@@ -32,13 +32,14 @@ export default function NoticeBoardApp() {
   const { user, isApproved, loading, loginError, handleLogin, handleLogout } = useVacationAuth();
 
   const { posts } = useRealtimeNoticePosts(!!user && isApproved);
-  const { createPost, updatePost, deletePost } = useNoticeActions();
+  const { createPost, updatePost, deletePost, addLike, removeLike } = useNoticeActions();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('create');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingAuthorEmail, setEditingAuthorEmail] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
+  const [openLikesId, setOpenLikesId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     title: '',
@@ -83,6 +84,7 @@ export default function NoticeBoardApp() {
     setEditingId(post.id);
     setEditingAuthorEmail(post.authorEmail);
     setForm({ title: post.title, content: post.content, tags: (post.tags || []).join(', ') });
+    setOpenLikesId(null);
     setIsFormOpen(true);
   };
 
@@ -166,6 +168,58 @@ export default function NoticeBoardApp() {
     }
   };
 
+  const isReadOnly = formMode === 'view';
+  const userEmail = user?.email;
+  const canManageEditing = !!editingAuthorEmail && !!userEmail && editingAuthorEmail === user.email;
+  const currentUserId = user?.uid || user?.email || '';
+  const currentUserName = user?.displayName || user?.email || '익명';
+
+  const seenPostIds = useRef<Set<string>>(new Set());
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!user || !isApproved) return;
+
+    if (!hasInitialized.current) {
+      posts.forEach((post) => seenPostIds.current.add(post.id));
+      hasInitialized.current = true;
+      return;
+    }
+
+    const newPosts = posts.filter((post) => !seenPostIds.current.has(post.id));
+    newPosts.forEach((post) => {
+      toast(`새로운 공지: ${post.title}`);
+      seenPostIds.current.add(post.id);
+    });
+  }, [posts, user, isApproved]);
+
+  const onToggleLike = async (post: {
+    id: string;
+    likes?: { uid: string; name: string; email?: string }[];
+  }) => {
+    if (!currentUserId || !user) return;
+    const userEmail = user.email;
+
+    const existing =
+      post.likes?.find((like) => like.uid === currentUserId) ||
+      post.likes?.find((like) => !!userEmail && like.email === userEmail);
+
+    try {
+      if (existing) {
+        await removeLike(post.id, existing);
+      } else {
+        await addLike(post.id, {
+          uid: currentUserId,
+          name: currentUserName,
+          email: userEmail,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('확인 처리에 실패했습니다.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -181,10 +235,6 @@ export default function NoticeBoardApp() {
   if (!isApproved) {
     return <UnauthorizedScreen email={user.email || user.uid} onLogout={handleLogout} />;
   }
-
-  const isReadOnly = formMode === 'view';
-  const canManageEditing =
-    !!editingAuthorEmail && !!user.email && editingAuthorEmail === user.email;
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 px-0 sm:px-2 md:px-4 lg:px-8">
@@ -267,20 +317,34 @@ export default function NoticeBoardApp() {
                 const createdLabel = formatDateTime(post.createdAt);
                 const subtitle = `${post.authorName} · ${createdLabel}`;
 
+                const likes = post.likes || [];
+                const likeCount = likes.length;
+                const hasLiked =
+                  likes.some((like) => like.uid === currentUserId) ||
+                  likes.some((like) => !!user.email && like.email === user.email);
+
+                const openDetails = () =>
+                  openPostModal({
+                    id: post.id,
+                    title: post.title,
+                    content: post.content,
+                    authorEmail: post.authorEmail,
+                    tags: post.tags,
+                  });
+
                 return (
-                  <button
+                  <div
                     key={post.id}
-                    type="button"
-                    onClick={() =>
-                      openPostModal({
-                        id: post.id,
-                        title: post.title,
-                        content: post.content,
-                        authorEmail: post.authorEmail,
-                        tags: post.tags,
-                      })
-                    }
-                    className="text-left bg-white border border-gray-200 rounded-2xl px-4 sm:px-5 py-4 sm:py-5 shadow-sm hover:shadow-md transition"
+                    role="button"
+                    tabIndex={0}
+                    onClick={openDetails}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openDetails();
+                      }
+                    }}
+                    className="relative text-left bg-white border border-gray-200 rounded-2xl px-4 sm:px-5 py-4 sm:py-5 shadow-sm hover:shadow-md transition"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -312,12 +376,58 @@ export default function NoticeBoardApp() {
                         ))}
                       </div>
                     )}
+                    <div className="mt-3 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleLike(post);
+                        }}
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition ${
+                          hasLiked
+                            ? 'border-blue-200 bg-blue-50 text-blue-700'
+                            : 'border-gray-200 bg-white text-gray-500 hover:border-blue-200 hover:text-blue-600'
+                        }`}
+                        aria-pressed={hasLiked}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        확인 {likeCount}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenLikesId((prev) => (prev === post.id ? null : post.id));
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] text-gray-500 hover:border-blue-200 hover:text-blue-600"
+                        aria-label="확인한 사람 보기"
+                      >
+                        <Users className="w-3.5 h-3.5" />
+                        사람 보기
+                      </button>
+                    </div>
+                    {openLikesId === post.id && (
+                      <div className="absolute right-4 top-full mt-2 w-44 rounded-lg border border-gray-200 bg-white p-2 shadow-lg z-20">
+                        <div className="text-[11px] text-gray-500 mb-1">확인한 사람</div>
+                        {likes.length === 0 ? (
+                          <div className="text-xs text-gray-400">아직 없습니다.</div>
+                        ) : (
+                          <ul className="max-h-32 overflow-auto text-xs text-gray-700">
+                            {likes.map((like) => (
+                              <li key={`${post.id}-${like.uid}`} className="py-0.5">
+                                🟥 {like.name}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
                     {post.updatedAt && (
                       <p className="mt-2 text-[11px] text-gray-400">
                         수정됨 · {formatDateTime(post.updatedAt)}
                       </p>
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>

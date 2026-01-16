@@ -1,3 +1,9 @@
+export interface NoticeLike {
+  uid: string;
+  name: string;
+  email?: string;
+}
+
 export interface NoticePost {
   id: string;
   title: string;
@@ -5,6 +11,7 @@ export interface NoticePost {
   authorName: string;
   authorEmail?: string;
   tags?: string[];
+  likes?: NoticeLike[];
   createdAt: string;
   updatedAt?: string;
 }

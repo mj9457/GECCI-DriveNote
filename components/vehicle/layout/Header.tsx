@@ -29,8 +29,6 @@ export const Header: React.FC<HeaderProps> = ({
   view,
   setView,
 }) => {
-  const router = useRouter();
-
   const isLogView = view === 'logs' || view === 'log';
   const Icon = isLogView ? NotebookText : Car;
   const toggleButtonLabel = isLogView ? '차량신청' : '운행일지';
